@@ -120,7 +120,7 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 		Update update1 =new Update().pull("mycollections", object);
 		mongoTemplate.updateFirst(query, update1, User_detailed.class);
 
-		
+
 		//添加新的景点收藏
 		Update update2 =new Update().addToSet("mycollections",placeid_Time);
 		UpdateResult updateResult= mongoTemplate.updateFirst(query, update2, User_detailed.class);
