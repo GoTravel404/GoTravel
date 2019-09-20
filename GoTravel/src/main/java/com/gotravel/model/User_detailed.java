@@ -1,4 +1,4 @@
-package com.gotravel.pojo;
+package com.gotravel.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 

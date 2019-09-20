@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.gotravel.pojo;
+package com.gotravel.model;
 
 /**
  * @Description: 用户信息表(user)

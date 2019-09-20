@@ -7,7 +7,7 @@ package com.gotravel.service.Impl;
 import com.gotravel.dao.nosqldao.LabelDao;
 import com.gotravel.dao.nosqldao.UserDetailedDao;
 import com.gotravel.dao.sqldao.UserDao;
-import com.gotravel.pojo.*;
+import com.gotravel.model.*;
 import com.gotravel.service.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

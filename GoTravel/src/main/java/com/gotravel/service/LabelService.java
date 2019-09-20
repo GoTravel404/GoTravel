@@ -1,6 +1,6 @@
 package com.gotravel.service;
 
-import com.gotravel.pojo.Label;
+import com.gotravel.model.Label;
 
 import java.util.List;
 

@@ -2,8 +2,8 @@ package com.gotravel.service.Impl;
 
 import com.gotravel.dao.nosqldao.PlaceDao;
 import com.gotravel.dao.nosqldao.UserDetailedDao;
-import com.gotravel.pojo.Place;
-import com.gotravel.pojo.User_detailed;
+import com.gotravel.model.Place;
+import com.gotravel.model.User_detailed;
 import com.gotravel.service.PlaceService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,23 +17,26 @@ import java.util.Map;
  * @Description: Place景点表的Service实现层
  * @date 2019年8月11日 下午9:22:28
  */
+
 @Service("placeService")
 @Transactional
 public class PlaceServiceImpl implements PlaceService {
 
     @Autowired
     private UserDetailedDao userDetailedDao;
+
     @Autowired
     private PlaceDao placeDao;
 
-   /**
-    * @Title findPlaceByuserlabel
-    * @Description:TODO 根据用户的标签为用户提供景点且按好评度排序
-    * @Param [phone]
-    * @return java.lang.String
-    * @Author: 陈一心
-    * @Date: 2019/9/9  22:43
-    **/
+
+    /**
+     * @Title findPlaceByuserlabel
+     * @Description:TODO 根据用户的标签为用户提供景点且按好评度排序
+     * @Param [phone]
+     * @return java.lang.String
+     * @Author: 陈一心
+     * @Date: 2019/9/9  22:43
+     **/
     @Override
     public String findPlaceByuserlabel(String phone) {
         // TODO Auto-generated method stub
@@ -95,5 +98,21 @@ public class PlaceServiceImpl implements PlaceService {
         return jsonObject.toString();
     }
 
-
+    /**
+     * @Title findPlacesByPraise
+     * @Description: TODO 根据好评度(热门)+地点设定的范围返回景点信息且按好评度排序
+     * @param distance 搜索范围
+     * @param lon 经度
+     * @param lat 维度
+     * @return java.lang.String
+     * @Author: chenyx
+     * @Date: 2019/9/20  16:21
+     **/
+    @Override
+    public String findPlacesByPraise(int distance, double lon, double lat) {
+        List<Place> places=placeDao.findPlacesByPraise(distance,lon,lat);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("places", places);
+        return jsonObject.toString();
+    }
 }

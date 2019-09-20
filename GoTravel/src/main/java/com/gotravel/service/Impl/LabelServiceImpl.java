@@ -2,7 +2,7 @@ package com.gotravel.service.Impl;
 
 
 import com.gotravel.dao.nosqldao.LabelDao;
-import com.gotravel.pojo.Label;
+import com.gotravel.model.Label;
 import com.gotravel.service.LabelService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

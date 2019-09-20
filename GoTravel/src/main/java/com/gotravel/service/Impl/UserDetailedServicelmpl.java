@@ -2,8 +2,8 @@ package com.gotravel.service.Impl;
 
 import com.gotravel.common.Common;
 import com.gotravel.dao.nosqldao.UserDetailedDao;
-import com.gotravel.pojo.Myhistory;
-import com.gotravel.pojo.Myplan;
+import com.gotravel.model.Myhistory;
+import com.gotravel.model.Myplan;
 import com.gotravel.service.UserDetailedService;
 import org.json.JSONArray;
 import org.json.JSONObject;

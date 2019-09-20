@@ -1,7 +1,7 @@
 package com.gotravel.dao.nosqldao;
 
 
-import com.gotravel.pojo.Label;
+import com.gotravel.model.Label;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;

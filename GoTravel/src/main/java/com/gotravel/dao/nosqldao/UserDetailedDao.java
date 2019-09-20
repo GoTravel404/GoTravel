@@ -1,9 +1,9 @@
 package com.gotravel.dao.nosqldao;
 
 
-import com.gotravel.pojo.Myhistory;
-import com.gotravel.pojo.Myplan;
-import com.gotravel.pojo.User_detailed;
+import com.gotravel.model.Myhistory;
+import com.gotravel.model.Myplan;
+import com.gotravel.model.User_detailed;
 
 import java.util.Date;
 import java.util.List;

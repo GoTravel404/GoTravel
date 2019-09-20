@@ -1,8 +1,8 @@
 package com.gotravel.dao.nosqldao;
 
 
-import com.gotravel.pojo.Place;
-import com.gotravel.pojo.User_detailed;
+import com.gotravel.model.Place;
+import com.gotravel.model.User_detailed;
 import java.util.List;
 
 /**
@@ -44,4 +44,15 @@ public interface PlaceDao {
 	 **/
 	public List<Place> findPlaceByplace_type(List<String> place_type);
 
+	/**
+	 * @Title findPlacesByPraise
+	 * @Description: TODO 根据好评度(热门)+地点设定的范围返回景点信息且按好评度排序
+	 * @param distance 搜索范围
+	 * @param lon 经度
+	 * @param lat 维度
+	 * @return java.util.List<com.gotravel.model.Place>
+	 * @Author: chenyx
+	 * @Date: 2019/9/20  16:27
+	 **/
+    List findPlacesByPraise(int distance, double lon, double lat);
 }

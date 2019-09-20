@@ -3,7 +3,7 @@ package com.gotravel.dao.nosqldao;
 
 import com.google.gson.Gson;
 import com.gotravel.common.Common;
-import com.gotravel.pojo.*;
+import com.gotravel.model.*;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.UpdateResult;
 import org.json.JSONObject;

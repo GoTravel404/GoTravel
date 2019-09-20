@@ -4,7 +4,7 @@
 package com.gotravel.dao.sqldao;
 
 
-import com.gotravel.pojo.User;
+import com.gotravel.model.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

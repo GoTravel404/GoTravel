@@ -1,11 +1,12 @@
-package com.gotravel.pojo;
+package com.gotravel.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Document(collection = "place")
-public class Place {
+public class Place implements Serializable {
 
     private int place_id;
     private String name;

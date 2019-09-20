@@ -1,4 +1,4 @@
-package com.gotravel.pojo;
+package com.gotravel.model;
 
 import java.util.List;
 

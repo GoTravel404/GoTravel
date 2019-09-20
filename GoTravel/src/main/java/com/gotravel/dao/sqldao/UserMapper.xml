@@ -14,7 +14,7 @@ select count(*) from user where phone = #{phone};
 </insert>
 
 <!--用户登录验证-->
-<select id="login" resultType="com.gotravel.pojo.User" parameterType="String">
+<select id="login" resultType="com.gotravel.model.User" parameterType="String">
 select * from user where phone=#{param1} and password=#{param2};
 </select>
 
@@ -24,7 +24,7 @@ update user set logins=1 where phone=#{phone};
 </update>
 
 <!--修改用户基本信息 -->
-<update id="editUser" parameterType="com.gotravel.pojo.User">
+<update id="editUser" parameterType="com.gotravel.model.User">
 update user set name=#{name} , gender=#{gender} , age=#{age} , image=#{image} where phone=#{phone};
 </update>
 </mapper>
