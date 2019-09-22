@@ -20,7 +20,7 @@ public interface LabelService {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  22:09
 	 **/
-	public List<Label> findLabel();
+	 List<Label> findLabel();
 
 
 	/**
@@ -31,7 +31,7 @@ public interface LabelService {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  22:09
 	 **/
-	public String getLabel();
+	  String getLabel();
 	
 
 }

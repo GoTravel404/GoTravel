@@ -3,24 +3,29 @@ package com.gotravel.dao.nosqldao;
 
 import com.gotravel.model.Place;
 import com.gotravel.model.User_detailed;
+
 import java.util.List;
 
 /**
  * 
- * @Description:  monodb的Place表的CURD接口
+ * @Description:TODO monodb的Place表的CURD接口
  *  @date 2019年8月11日 下午9:53:35
  */
 public interface PlaceDao {
 
+
 	/**
 	 * @Title findByuser_label
-	 * @Description:TODO 根据用户的标签为用户提供景点且按好评度排序
-	 * @Param [user_detailed]
-	 * @return java.util.List<Place>
-	 * @Author: 陈一心
-	 * @Date: 2019/9/8  21:49
+	 * @Description: TODO 根据用户的标签+地点设定的范围为用户提供景点且按好评度排序
+	 * @param user_detailed 用户标签
+	 * @param distance 距离
+	 * @param lon 经度
+	 * @param lat 维度
+	 * @return java.util.List<com.gotravel.model.Place>
+	 * @Author: chenyx
+	 * @Date: 2019/9/21  10:20
 	 **/
-	public List<Place> findByuser_label(User_detailed user_detailed);
+	 List<Place> findByuser_label(User_detailed user_detailed, int distance, double lon, double lat);
 
 
 	/**
@@ -31,18 +36,24 @@ public interface PlaceDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:50
 	 **/
-	public Place findPlaceByplace_id(int place_id);
+	 Place findPlaceByplace_id(int place_id);
 
 
 	/**
-	 * @Title findPlaceByplace_type
-	 * @Description:TODO 根据景点的place_type(封装成List类型)返回景点信息且按好评度排序
-	 * @Param [place_type]
-	 * @return java.util.List<Place>
-	 * @Author: 陈一心
-	 * @Date: 2019/9/8  21:50
+	 * @Title findPlacesByPlaceLabel
+	 * @Description: TODO 根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)+地点设定的范围返回景点信息且按好评度排序
+	 * @param hobby
+	 * @param customization
+	 * @param place_type
+	 * @param distance
+	 * @param lon
+	 * @param lat
+	 * @return java.util.List<com.gotravel.model.Place>
+	 * @Author: chenyx
+	 * @Date: 2019/9/21  15:29
 	 **/
-	public List<Place> findPlaceByplace_type(List<String> place_type);
+	 List<Place> findPlacesByPlaceLabel(List<String> hobby, List<String> customization, List<String> place_type, int distance, double lon, double lat);
+
 
 	/**
 	 * @Title findPlacesByPraise

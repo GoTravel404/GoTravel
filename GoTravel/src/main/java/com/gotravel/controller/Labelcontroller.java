@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  *
  * @Description: TODO Label集合的所有操作接口
@@ -28,7 +26,7 @@ public class Labelcontroller {
      * @Date: 2019/9/8  21:17
      **/
     @RequestMapping(value = "/getlabel", method = RequestMethod.GET)
-    public String getlabel(HttpServletRequest request) {
+    public String getlabel() {
         return labelService.getLabel();
     }
 }

@@ -20,7 +20,7 @@ public interface LabelDao {
      * @Author: 陈一心
      * @Date: 2019/9/8  21:48
      **/
-	public List<Label> findLabel();
+	 List<Label> findLabel();
 
 	
 }

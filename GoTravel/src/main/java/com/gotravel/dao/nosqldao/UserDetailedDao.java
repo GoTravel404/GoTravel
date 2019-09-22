@@ -24,7 +24,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:53
 	 **/
-	public User_detailed findOne(String phone);
+	 User_detailed findOne(String phone);
 
 
 	/**
@@ -35,7 +35,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:54
 	 **/
-	public void adduserdetailed(User_detailed user_detailed);
+	 void adduserdetailed(User_detailed user_detailed);
 
 
 	/**
@@ -46,7 +46,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:54
 	 **/
-	public int edit_label(String phone, List<String> hobby, List<String> customization);
+	 int edit_label(String phone, List<String> hobby, List<String> customization);
 
 
 	/**
@@ -57,7 +57,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:54
 	 **/
-	public User_detailed findByphone(String phone);
+	 User_detailed findByphone(String phone);
 
 	/**
 	 * @Title: addmycollections 
@@ -67,7 +67,7 @@ public interface UserDetailedDao {
 	 * @author 陈一心
 	 * @date 2019年8月12日 下午3:38:49
 	 */
-	public int addmycollections(String phone, int place_id, Date time);
+	 int addmycollections(String phone, int place_id, Date time);
 
 
 	/**
@@ -78,7 +78,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:54
 	 **/
-	public int deletemycollections(String phone, int place_id);
+	 int deletemycollections(String phone, int place_id);
 
 
 	/**
@@ -89,7 +89,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:54
 	 **/
-	public int addmyplans(String phone, String plan_name, List<Integer> places_id, Date time);
+	 int addmyplans(String phone, String plan_name, List<Integer> places_id, Date time);
 
 
 	/**
@@ -100,7 +100,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:55
 	 **/
-	public int editmyplans(String phone, String plan_name, List<Integer> places_id, Date time);
+	 int editmyplans(String phone, String plan_name, List<Integer> places_id, Date time);
 	
 
 	/**
@@ -111,7 +111,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:55
 	 **/
-	public int deletemyplans(String phone, Date time);
+	 int deletemyplans(String phone, Date time);
 
 
 	/**
@@ -122,7 +122,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:55
 	 **/
-	public int addhistory(String phone, int place_id, String dateStr) ;
+	 int addhistory(String phone, int place_id, String dateStr) ;
 
 
 	/**
@@ -133,7 +133,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:55
 	 **/
-	public int deletehistoryplace(String phone, int place_id, String date);
+	 int deletehistoryplace(String phone, int place_id, String date);
 
 
 	/**
@@ -144,7 +144,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:56
 	 **/
-	public int deletehistory(String phone, String date);
+	 int deletehistory(String phone, String date);
 
 
 	/**
@@ -155,7 +155,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:58
 	 **/
-	public String findmycollections(String phone);
+	 String findmycollections(String phone);
 
 
 	/**
@@ -166,7 +166,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:59
 	 **/
-	public List<Myhistory> findmyhistories(String phone);
+	 List<Myhistory> findmyhistories(String phone);
 
 
 	/**
@@ -177,7 +177,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:59
 	 **/
-	public String findmyhistories_detailed(String phone, String date);
+	 String findmyhistories_detailed(String phone, String date);
 
 
 	/**
@@ -188,7 +188,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:59
 	 **/
-	public List<Myplan> findmyplans(String phone);
+	 List<Myplan> findmyplans(String phone);
 
 
 	/**
@@ -199,7 +199,7 @@ public interface UserDetailedDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  21:59
 	 **/
-	public String findmyplans_detailed(String phone, Date time);
+	 String findmyplans_detailed(String phone, Date time);
 
 	
 

@@ -77,12 +77,13 @@
             <optional>true</optional>
         </dependency>
 
-        <!--&lt;!&ndash;@Slf4j注解日志的依赖&ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>org.projectlombok</groupId>-->
-            <!--<artifactId>lombok</artifactId>-->
-            <!--<optional>true</optional>-->
-        <!--</dependency>-->
+        <!--引入日志 @Slf4j注解-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <build>

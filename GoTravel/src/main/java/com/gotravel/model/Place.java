@@ -99,4 +99,22 @@ public class Place implements Serializable {
         this.customization = customization;
     }
 
+
+   /**针对List集合中的对象重写hashcode()和equals()方法；retainAll()和removeAll()会利用对象的这两个方法来比较对象是否是同一个对象**/
+    @Override
+    public int hashCode() {
+        return this.place_id;
+    }
+
+    //重写
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Place) {
+            Place place = (Place) obj;
+            return this.place_id == place.place_id;
+        }
+        return true;
+    }
+
+
 }

@@ -19,15 +19,15 @@ public class Placescontroller {
 
     /**
      * @Title findPlacesByUserlabel
-     * @Description: TODO 根据用户的标签为用户提供景点且按好评度排序
+     * @Description: TODO 根据用户的标签+地点设定的范围为用户提供景点且按好评度排序
      * @Param [phone]
      * @return java.lang.String
      * @Author: 陈一心
      * @Date: 2019/9/9  22:57
      **/
-    @RequestMapping(value = "/findPlacesByUserlabel", method = RequestMethod.GET)
-    public String findPlaceByuserlabel(@RequestParam String phone) {
-        return placeService.findPlaceByuserlabel(phone);
+    @RequestMapping(value = "/findPlacesByUserlabel", method = RequestMethod.POST)
+    public String findPlaceByuserlabel(@RequestParam String phone, @RequestParam int distance, @RequestParam double lon, @RequestParam double lat) {
+        return placeService.findPlaceByuserlabel(phone, distance, lon, lat);
     }
 
 
@@ -46,16 +46,16 @@ public class Placescontroller {
 
 
     /**
-     * @Title findPlaceByplace_type
-     * @Description:TODO 根据景点的place_type(封装成List类型)返回景点信息且按好评度排序
-     * @Param [map] List<String>
+     * @Title findPlacesByPlaceLabel
+     * @Description: TODO 根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)+地点设定的范围返回景点信息且按好评度排序
+     * @param map List<hobby>，List<customization>，List<place_type> ，distance 距离 ，lon 经度 ，lat 维度
      * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/8  21:19
+     * @Author: chenyx
+     * @Date: 2019/9/21  10:37
      **/
-    @RequestMapping(value = "/findPlacesByPlace_type", method = RequestMethod.POST)
-    public String findPlaceByplace_type(@RequestBody Map<String, Object> map) {
-        return placeService.findPlaceByplace_type(map);
+    @RequestMapping(value = "/findPlacesByPlaceLabel", method = RequestMethod.POST)
+    public String findPlacesByPlaceLabel(@RequestBody Map<String, Object> map) {
+        return placeService.findPlacesByPlaceLabel(map);
     }
 
 
