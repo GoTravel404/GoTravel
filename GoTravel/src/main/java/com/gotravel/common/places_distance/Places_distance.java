@@ -4,7 +4,9 @@ import com.gotravel.model.Place;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName:Places_distance
@@ -57,13 +59,13 @@ public class Places_distance {
      * @param distance 范围
      * @param lon 经度
      * @param lat 维度
-     * @return java.util.List<com.gotravel.model.Place>
+     * @return java.util.List<java.util.Map < java.lang.String , java.lang.Object>>
      * @Author: chenyx
-     * @Date: 2019/9/20  23:31
+     * @Date: 2019/9/27  22:44
      **/
-    public static List<Place> getFitDistancePlaces(List<Place> placesList, int distance, double lon, double lat) {
+    public static List<Map<String, Object>> getFitDistancePlaces(List<Place> placesList, int distance, double lon, double lat) {
 
-        List<Place> placeList = new ArrayList<>(); //转载符合的范围的景点
+        List<Map<String, Object>> placeList = new ArrayList<>(); //转载符合的范围的景点
         String str = ""; //日志用
 
         for (Place place : placesList) {
@@ -80,14 +82,16 @@ public class Places_distance {
 
                 if (int_distance <= distance) { //地点在指定的范围
                     str += " " + int_distance;
-                    placeList.add(place);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("distance", int_distance);
+                    map.put("place", place);
+                    placeList.add(map);
                 }
             }
         }
         log.info("----符合的景点的距离-----" + str);
         return placeList;
     }
-
 
 
 }

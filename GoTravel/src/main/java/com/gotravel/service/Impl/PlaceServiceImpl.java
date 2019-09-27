@@ -46,7 +46,7 @@ public class PlaceServiceImpl implements PlaceService {
         //数据库根据phone返回该用户的详细信息
         User_detailed user_detailed = userDetailedDao.findByphone(phone);
         //数据库根据用户的标签为用户提供景点且按好评度排序
-        List<Place> places = placeDao.findByuser_label(user_detailed, distance, lon, lat);
+        List<Map<String, Object>> places = placeDao.findByuser_label(user_detailed, distance, lon, lat);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("places", places);
         return jsonObject.toString();
@@ -93,14 +93,14 @@ public class PlaceServiceImpl implements PlaceService {
     @SuppressWarnings("unchecked")
     public String findPlacesByPlaceLabel(Map<String, Object> map) {
         // TODO Auto-generated method stub
-        List<String> hobby= (List<String>)map.get("hobby");
+        List<String> hobby = (List<String>) map.get("hobby");
         List<String> customization = (List<String>) map.get("customization");
         List<String> place_type = (List<String>) map.get("place_type");
         int distance = (int) map.get("distance");
         double lon = (double) map.get("lon");
         double lat = (double) map.get("lat");
         //数据库根据place_label(List<String>)返回景点信息
-        List<Place> places = placeDao.findPlacesByPlaceLabel(hobby,customization,place_type, distance, lon, lat);
+        List<Map<String, Object>> places = placeDao.findPlacesByPlaceLabel(hobby, customization, place_type, distance, lon, lat);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("places", places);
         return jsonObject.toString();
@@ -118,7 +118,7 @@ public class PlaceServiceImpl implements PlaceService {
      **/
     @Override
     public String findPlacesByPraise(int distance, double lon, double lat) {
-        List<Place> places = placeDao.findPlacesByPraise(distance, lon, lat);
+        List<Map<String, Object>> places = placeDao.findPlacesByPraise(distance, lon, lat);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("places", places);
         return jsonObject.toString();

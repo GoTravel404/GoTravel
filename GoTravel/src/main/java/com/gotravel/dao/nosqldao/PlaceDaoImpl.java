@@ -12,7 +12,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:TODO mongodb的Place表的CURD实现层
@@ -37,12 +39,12 @@ public class PlaceDaoImpl implements PlaceDao {
      * @param distance 距离
      * @param lon 经度
      * @param lat 维度
-     * @return java.util.List<com.gotravel.model.Place>
+     * @return List<Map < String , Object>>
      * @Author: chenyx
      * @Date: 2019/9/21  10:22
      **/
     @Override
-    public List<Place> findByuser_label(User_detailed user_detailed, int distance, double lon, double lat) {
+    public List<Map<String, Object>> findByuser_label(User_detailed user_detailed, int distance, double lon, double lat) {
         // TODO Auto-generated method stub
         List<String> hobby = user_detailed.getHobby();
         List<String> customization = user_detailed.getCustomization();
@@ -53,8 +55,8 @@ public class PlaceDaoImpl implements PlaceDao {
         Query query = new Query(criteria.orOperator(criteriaHobby, criteriaCustomization));
         query.with(new Sort(Direction.DESC, "praise"));
         List<Place> placesList = mongoTemplate.find(query, Place.class);
-        placesList =Places_distance.getFitDistancePlaces(placesList, distance, lon, lat);
-        return placesList;
+        List<Map<String, Object>> maps = Places_distance.getFitDistancePlaces(placesList, distance, lon, lat);
+        return maps;
     }
 
 
@@ -83,12 +85,12 @@ public class PlaceDaoImpl implements PlaceDao {
      * @param distance
      * @param lon
      * @param lat
-     * @return java.util.List<com.gotravel.model.Place>
+     * @return List<Map < String , Object>>
      * @Author: chenyx
      * @Date: 2019/9/21  15:30
      **/
     @Override
-    public List<Place> findPlacesByPlaceLabel(List<String> hobby, List<String> customization, List<String> place_type, int distance, double lon, double lat) {
+    public List<Map<String, Object>> findPlacesByPlaceLabel(List<String> hobby, List<String> customization, List<String> place_type, int distance, double lon, double lat) {
         //查询redis缓存里所有的景点信息
         List redisPlacesList = redisAllPlaces.getRedisAllPlacesList();
         List placesListByHobby, placesListByCus, placesListByP_t;
@@ -127,9 +129,9 @@ public class PlaceDaoImpl implements PlaceDao {
         log.info("---------二组Label都存在的景点---------" + placesListByHobby.size());
         placesListByHobby.retainAll(placesListByP_t);
         log.info("---------三组Label都存在的景点---------" + placesListByHobby.size());
-        List<Place> placesList = Places_distance.getFitDistancePlaces(placesListByHobby, distance, lon, lat);
-        log.info("---------最后符合的景点个数---------" + placesList.size());
-        return placesList;
+        List<Map<String, Object>> maps = Places_distance.getFitDistancePlaces(placesListByHobby, distance, lon, lat);
+        log.info("---------最后符合的景点个数---------" + maps.size());
+        return maps;
     }
 
 
@@ -139,18 +141,17 @@ public class PlaceDaoImpl implements PlaceDao {
      * @param distance 范围
      * @param lon 经度
      * @param lat 维度
-     * @return java.util.List<com.gotravel.model.Place>
+     * @return List<Map < String , Object>>
      * @Author: chenyx
      * @Date: 2019/9/20  16:28
      **/
     @Override
-    public List<Place> findPlacesByPraise(int distance, double lon, double lat) {
+    public List<Map<String, Object>> findPlacesByPraise(int distance, double lon, double lat) {
         //查询所有景点信息
         List placesList = redisAllPlaces.getRedisAllPlacesList();
-        List<Place> rsplaceList = Places_distance.getFitDistancePlaces(placesList, distance, lon, lat);
-        return rsplaceList;
+        List<Map<String, Object>> maps = Places_distance.getFitDistancePlaces(placesList, distance, lon, lat);
+        return maps;
     }
-
 
 
 }
