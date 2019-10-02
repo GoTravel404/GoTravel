@@ -1,12 +1,13 @@
 package com.gotravel.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * 个性表
  * **/
 
-public class Label {
+public class Label implements Serializable {
 
 	private int chi_id;
 	private List<String> hobby;
