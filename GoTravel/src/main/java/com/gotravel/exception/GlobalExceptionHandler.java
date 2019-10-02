@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
             JSONObject json = new JSONObject();
             json.put("msg", "系统出错啦");
             json.put("code", 500);
-           // e.printStackTrace();
+            e.printStackTrace();
             return json.toString();
     }
 }

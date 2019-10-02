@@ -12,7 +12,7 @@ import java.util.List;
 
 
 /**
- * @Description: User表的CURD接口
+ * @Description: TODO User表的CURD接口
  *  @date 2019年8月8日 下午11:50:50
  */
 
@@ -28,7 +28,7 @@ public interface UserDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  22:04
 	 **/
-	public int check_phone_isexist(String phone);
+	 int check_phone_isexist(String phone);
 
 	/**
 	 * @Title register
@@ -38,7 +38,7 @@ public interface UserDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  22:04
 	 **/
-	public void register(String phone, String password);
+	 void register(String phone, String password);
 
 
 	/**
@@ -49,7 +49,7 @@ public interface UserDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  22:04
 	 **/
-	public List<User> login(String phone, String password);
+	 List<User> login(String phone, String password);
 
 
 	/**
@@ -60,7 +60,7 @@ public interface UserDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  22:04
 	 **/
-	public void addlogins(String phone);
+	 void addlogins(String phone);
 
 
 	/**
@@ -71,7 +71,7 @@ public interface UserDao {
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  22:05
 	 **/
-	public void editUser(User user);
+	 void editUser(User user);
 
 
 
