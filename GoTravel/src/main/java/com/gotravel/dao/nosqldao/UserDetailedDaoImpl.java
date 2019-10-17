@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *
  * @Description: mongodb的User_Detailed表的CURD实现层
  *  @date 2019年8月10日 下午9:55:05
  */
 @Repository
 public class UserDetailedDaoImpl  implements  UserDetailedDao{
-	
+
 	@Autowired
 	 private MongoTemplate mongoTemplate;
-	
+
 
 	/**
 	 * @Title findOne
@@ -96,7 +96,7 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 	public User_detailed findByphone(String phone) {
 		// TODO Auto-generated method stub
 		Query query = new Query(Criteria.where("phone").is(phone));
-		return mongoTemplate.findOne(query, User_detailed.class);	  
+		return mongoTemplate.findOne(query, User_detailed.class);
 	}
 
 
@@ -184,7 +184,7 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 		UpdateResult updateResult = mongoTemplate.updateFirst(query, update, User_detailed.class);
 		return (int) updateResult.getModifiedCount();
 	}
-	
+
 
 	/**
 	 * @Title deletemyplans
@@ -223,7 +223,7 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 	      Date time = Common.TimeConversion(dateStr);	//时间转换
 	      Placeid_Time places_time=new Placeid_Time(place_id, time);		//到达一个景点和时间
 	      Query query1 = new Query(Criteria.where("phone").is(phone).and("myhistories.date").is(date));	//判断是否已存在年月日(date)
-	      User_detailed user_detailed=mongoTemplate.findOne(query1, User_detailed.class);		      
+	      User_detailed user_detailed=mongoTemplate.findOne(query1, User_detailed.class);
 	  /**
 	   * 判断是否已经存在当天的历史出行
 	   */
@@ -233,13 +233,13 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 	      Myhistory myhistory=new Myhistory(placeid_Times, date);		//当天的历史出行
 	      Query query2= new Query(Criteria.where("phone").is(phone));
 	      Update update = new Update().push("myhistories", myhistory);
-	      updateResult= mongoTemplate.updateFirst(query2, update, User_detailed.class);          
+	      updateResult= mongoTemplate.updateFirst(query2, update, User_detailed.class);
 	  }
 	  else{	//存在则直接添加到当天的出行计划
 	      Update update = new Update().push("myhistories.$.places_time", places_time);
-	      updateResult= mongoTemplate.updateFirst(query1, update, User_detailed.class);        
+	      updateResult= mongoTemplate.updateFirst(query1, update, User_detailed.class);
 	  }
-	     return (int) updateResult.getModifiedCount();	     
+	     return (int) updateResult.getModifiedCount();
 	}
 
 
@@ -339,8 +339,8 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 		}
 		//results转为json格式
 		Gson gson = new Gson();
-		String jsonString = gson.toJson(results);		
-		return jsonString;		
+		String jsonString = gson.toJson(results);
+		return jsonString;
 	}
 
 
@@ -354,14 +354,14 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 	 **/
 	@Override
 	public List<Myhistory> findmyhistories(String phone) {
-		// TODO Auto-generated method stub	
+		// TODO Auto-generated method stub
 		Query query = new Query(Criteria.where("phone").is(phone));
 		query.fields().include("myhistories.places_time").include("myhistories.date");
 		 User_detailed user_detailed=  mongoTemplate.findOne(query, User_detailed.class);
 		return  user_detailed.getMyhistories();
 	}
 
-
+//有问题！！！！！！！！！！！！！！！！！！！
 	/**
 	 * @Title findmyhistories_detailed
 	 * @Description:TODO 根据phone和date联表(user_detailed和place)查找某一天的历史出行详情列表
@@ -377,7 +377,9 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 		//拼装信息
 		AggregationOperation lookup = Aggregation.lookup("place", "myhistories.places_time.place_id", "place_id","myhistories_detailed"); 		//关联从表名, 主表关联字段,从表关联的字段,设置查询结果集合名
 		AggregationOperation unwind = Aggregation.unwind("myhistories_detailed");		 //以什么分散
-		AggregationOperation match = Aggregation.match(Criteria.where("phone").is(phone).and("myhistories.date").is(date));	//主表的条件
+		BasicDBObject object = new BasicDBObject();
+		object.put("date", date);
+		AggregationOperation match = Aggregation.match(Criteria.where("phone").is(phone).and("myhistories").elemMatch(Criteria.where("date").is(date)));	//主表的条件
 	    AggregationOperation project = Aggregation.project("myhistories_detailed.place_id","myhistories_detailed.name", "myhistories_detailed.picture").andExclude("_id");	//返回的字段，不返回自带的“_id”
 		//将条件封装到Aggregate管道
 		Aggregation aggregation = Aggregation.newAggregation(lookup,match,unwind,project);
@@ -386,22 +388,23 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 		 * 返回历史出行景点对应的时间time
 		 * PS:代码很不友好，如果有其他方法最好，例如直接在Aggregation聚合中获取最好
 		 */
-		Query query = new Query(Criteria.where("phone").is(phone).and("myhistories.date").is(date));
+		Query query = new Query(Criteria.where("phone").is(phone));
 		query.fields().include("myhistories");
 		User_detailed user_detailed = mongoTemplate.findOne(query, User_detailed.class);
 		int i = 0;
 		for (Object myhistoryObject : user_detailed.getMyhistories()) {
 			Myhistory myhistory = (Myhistory) myhistoryObject;
 			if (myhistory.getDate().equals(date)) //查找日期为date的当天出行历史记录
+				System.out.println("myhistory.getPlaces_time().size():"+myhistory.getPlaces_time().size()+"----------------results:"+results.size());
 				for (Map<String, Object> map : results) {
-					map.put("time", myhistory.getPlaces_time().get(i).getTime());
+					//map.put("time", myhistory.getPlaces_time().get(i).getTime());
 					i++;
-				}	
+				}
 		}
 		//results转为json格式
-		Gson gson = new Gson();	
-		String jsonString = gson.toJson(results);			
-		return jsonString;		
+		Gson gson = new Gson();
+		String jsonString = gson.toJson(results);
+		return jsonString;
 	}
 
 	/**
@@ -461,7 +464,7 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 			if (myplan.getTime().equals(time)) {          //获取出行计划的制定时间(time)为time的出行计划
 				plan_name=myplan.getPlan_name();
 				listplaces = myplan.getPlaces_id();		//获取计划中的景点编号列表
-				for (Integer place_id : listplaces) {					
+				for (Integer place_id : listplaces) {
 					Query query1 = new Query(Criteria.where("place_id").is(place_id));
 					query1.fields().include("place_id").include("name").include("picture").include("praise");
 					Place place = mongoTemplate.findOne(query1, Place.class);
@@ -469,11 +472,11 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 				}
 			}
 		}
-		jsonObject.put("plan_name", plan_name);	
+		jsonObject.put("plan_name", plan_name);
 		jsonObject.put("places", places);
-		jsonObject.put("time", time);	
+		jsonObject.put("time", time);
 		return jsonObject.toString();
 	}
 
-	
+
 }

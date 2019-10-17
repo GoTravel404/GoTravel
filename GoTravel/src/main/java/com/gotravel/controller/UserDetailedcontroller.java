@@ -61,7 +61,7 @@ public class UserDetailedcontroller {
 
     /**
      * @Title addmyplans
-     * @Description:TODO
+     * @Description:TODO 用户添加个人出行计划
      * @Param [map] phone,plan_name,places_id,time
      * @return java.lang.String
      * @Author: 陈一心
