@@ -47,8 +47,10 @@ public class PlaceServiceImpl implements PlaceService {
         User_detailed user_detailed = userDetailedDao.findByphone(phone);
         //数据库根据用户的标签为用户提供景点且按好评度排序
         List<Map<String, Object>> places = placeDao.findByuser_label(user_detailed, distance, lon, lat);
+        List<Integer> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("places", places);
+        jsonObject.put("collectionsPlaceIds", collectionsPlaceIds);
         return jsonObject.toString();
     }
 
@@ -84,7 +86,7 @@ public class PlaceServiceImpl implements PlaceService {
     /**
      * @Title findPlacesByPlaceLabel
      * @Description: TODO 根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)+地点设定的范围返回景点信息且按好评度排序
-     * @param map List<hobby>，List<customization>，List<place_type> ，distance 距离 ，lon 经度 ，lat 维度
+     * @param map List<hobby>，List<customization>，List<place_type> ，distance 距离 ，lon 经度 ，lat 维度 , phone 手机号
      * @return java.lang.String
      * @Author: chenyx
      * @Date: 2019/9/21  15:26
@@ -93,6 +95,7 @@ public class PlaceServiceImpl implements PlaceService {
     @SuppressWarnings("unchecked")
     public String findPlacesByPlaceLabel(Map<String, Object> map) {
         // TODO Auto-generated method stub
+        String phone = (String) map.get("phone");
         List<String> hobby = (List<String>) map.get("hobby");
         List<String> customization = (List<String>) map.get("customization");
         List<String> place_type = (List<String>) map.get("place_type");
@@ -101,14 +104,17 @@ public class PlaceServiceImpl implements PlaceService {
         double lat = (double) map.get("lat");
         //数据库根据place_label(List<String>)返回景点信息
         List<Map<String, Object>> places = placeDao.findPlacesByPlaceLabel(hobby, customization, place_type, distance, lon, lat);
+        List<Integer> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("places", places);
+        jsonObject.put("collectionsPlaceIds", collectionsPlaceIds);
         return jsonObject.toString();
     }
 
     /**
      * @Title findPlacesByPraise
      * @Description: TODO 根据好评度(热门)+地点设定的范围返回景点信息且按好评度排序
+     * @param phone 手机号
      * @param distance 搜索范围
      * @param lon 经度
      * @param lat 维度
@@ -117,10 +123,12 @@ public class PlaceServiceImpl implements PlaceService {
      * @Date: 2019/9/20  16:21
      **/
     @Override
-    public String findPlacesByPraise(int distance, double lon, double lat) {
+    public String findPlacesByPraise(String phone, int distance, double lon, double lat) {
         List<Map<String, Object>> places = placeDao.findPlacesByPraise(distance, lon, lat);
+        List<Integer> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("places", places);
+        jsonObject.put("collectionsPlaceIds", collectionsPlaceIds);
         return jsonObject.toString();
     }
 }

@@ -201,6 +201,14 @@ public interface UserDetailedDao {
 	 **/
 	 String findmyplans_detailed(String phone, Date time);
 
-	
+	 /**
+	  * @Title findMyCollectionsPlaceId
+	  * @Description: TODO 根据phone查找用户收藏的所有景点，组成List<Integer>
+	  * @param phone 手机号
+	  * @return java.util.List<java.lang.Integer>
+	  * @Author: chenyx
+	  * @Date: 2019/11/8  21:35
+	  **/
+	 List<Integer> findMyCollectionsPlaceId(String phone);
 
 }
