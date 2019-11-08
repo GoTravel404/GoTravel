@@ -38,7 +38,7 @@ public interface PlaceService {
     /**
      * @Title findPlacesByPlaceLabel
      * @Description: TODO 根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)+地点设定的范围返回景点信息且按好评度排序
-     * @param map List<hobby>，List<customization>，List<place_type> ，distance 距离 ，lon 经度 ，lat 维度
+     * @param map List<hobby>，List<customization>，List<place_type> ，distance 距离 ，lon 经度 ，lat 维度 ，phone 手机号
      * @return java.lang.String
      * @Author: chenyx
      * @Date: 2019/9/21  15:26
@@ -49,6 +49,7 @@ public interface PlaceService {
     /**
      * @Title findPlacesByPraise
      * @Description: TODO 根据好评度(热门)+地点设定的范围返回景点信息且按好评度排序
+     * @param phone 手机号
      * @param distance 搜索 范围
      * @param lon 经度
      * @param lat 维度
@@ -56,5 +57,5 @@ public interface PlaceService {
      * @Author: chenyx
      * @Date: 2019/9/20  16:20
      **/
-    String findPlacesByPraise(int distance, double lon, double lat);
+    String findPlacesByPraise(String phone, int distance, double lon, double lat);
 }

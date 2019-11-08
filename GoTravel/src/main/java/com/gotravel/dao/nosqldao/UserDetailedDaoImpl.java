@@ -478,5 +478,23 @@ public class UserDetailedDaoImpl  implements  UserDetailedDao{
 		return jsonObject.toString();
 	}
 
-
+	/**
+	 * @Title findMyCollectionsPlaceId
+	 * @Description: TODO 根据phone查找用户收藏的所有景点，组成List<Integer>
+	 * @param phone 手机号
+	 * @return java.util.List<java.lang.Integer>
+	 * @Author: chenyx
+	 * @Date: 2019/11/8  21:37
+	 **/
+	@Override
+	public List<Integer> findMyCollectionsPlaceId(String phone) {
+		Query query = new Query(Criteria.where("phone").is(phone));
+		query.fields().include("mycollections");
+		User_detailed user_detailed = mongoTemplate.findOne(query, User_detailed.class);
+		List<Integer> collectionsPlaceIds=new ArrayList<>();
+		for(Placeid_Time placeid_time:user_detailed.getMycollections()){
+			collectionsPlaceIds.add( placeid_time.getPlaces_id());
+		}
+		return collectionsPlaceIds;
+	}
 }

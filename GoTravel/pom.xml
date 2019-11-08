@@ -11,7 +11,7 @@
 
     <groupId>com.GoTravel</groupId>
     <artifactId>gotravel</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>war</packaging>
     <name>gotravel</name>
     <description>走·旅行的前台接口</description>

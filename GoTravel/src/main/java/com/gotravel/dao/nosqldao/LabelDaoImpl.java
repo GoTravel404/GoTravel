@@ -22,7 +22,7 @@ import java.util.List;
 @Repository
 public class LabelDaoImpl implements LabelDao {
 
-	//Redis缓存的所有景点List的key值
+	//Redis缓存的所有景点的Label的key值
 	private final static String REDIS_KEY = "AllPlacesLabel";
 
 	@Autowired
