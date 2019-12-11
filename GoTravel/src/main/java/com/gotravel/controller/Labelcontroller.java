@@ -33,7 +33,7 @@ public class Labelcontroller {
 
     /**
      * @Title getAllLabel
-     * @Description: TODO 返回官方的所有标签
+     * @Description: TODO  返回官方的所有标签
      * @param
      * @return java.lang.String
      * @Author: chenyx
