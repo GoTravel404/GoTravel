@@ -39,7 +39,7 @@ public class LabelServiceImpl implements LabelService {
 
     /**
      * @Title getLabel
-     * @Description:TODO 返回官方的所有标签
+     * @Description:TODO 返回官方的标签
      * @Param []
      * @return java.lang.String
      * @Author: 陈一心
@@ -57,4 +57,25 @@ public class LabelServiceImpl implements LabelService {
         return jsonObject.toString();
     }
 
+
+    /**
+     * @Title getAllLabel
+     * @Description: TODO 返回官方的所有标签
+     * @param
+     * @return java.lang.String
+     * @Author: chenyx
+     * @Date: 2019/12/11  11:28
+     **/
+    @Override
+    public String getAllLabel() {
+        List<Label> labels = labelDao.findLabel();
+        List<String> label_hobby = labels.get(0).getHobby();
+        List<String> label_customization = labels.get(0).getCustomization();
+        List<String> label_place_type = labels.get(0).getPlace_type();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("label_hobby", label_hobby);
+        jsonObject.put("label_customization", label_customization);
+        jsonObject.put("label_place_type", label_place_type);
+        return jsonObject.toString();
+    }
 }

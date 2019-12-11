@@ -19,7 +19,7 @@ public class Labelcontroller {
 
     /**
      * @Title getlabel
-     * @Description:TODO 返回官方的标签
+     * @Description:TODO 返回官方的标签；只返回了爱好和制定
      * @Param [request]
      * @return java.lang.String
      * @Author: 陈一心
@@ -28,5 +28,19 @@ public class Labelcontroller {
     @RequestMapping(value = "/getlabel", method = RequestMethod.GET)
     public String getlabel() {
         return labelService.getLabel();
+    }
+
+
+    /**
+     * @Title getAllLabel
+     * @Description: TODO 返回官方的所有标签
+     * @param
+     * @return java.lang.String
+     * @Author: chenyx
+     * @Date: 2019/12/11  11:26
+     **/
+    @RequestMapping(value = "/getAllLabel", method = RequestMethod.GET)
+    public String getAllLabel() {
+        return labelService.getAllLabel();
     }
 }
