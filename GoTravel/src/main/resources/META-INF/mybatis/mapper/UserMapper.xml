@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gotravel.dao.sqldao.UserDao">
-<!--检查是否已经存在phone-->
-<select id="check_phone_isexist" resultType="int" parameterType="String">
-select count(*) from user where phone = #{phone};
-</select>
 
-<!--注册用户账号-->
-<insert id="register"  parameterType="String" >
-	insert into user(phone,password)  values (#{param1},#{param2})
-</insert>
+    <!--检查是否已经存在phone-->
+    <select id="check_phone_is_exist" resultType="int" parameterType="String">
+        select count(*) from user where phone = #{phone};
+    </select>
 
-<!--用户登录验证-->
-<select id="login" resultType="com.gotravel.model.User" parameterType="String">
-select * from user where phone=#{param1} and password=#{param2};
-</select>
+    <!--注册用户账号-->
+    <insert id="register" parameterType="String">
+        insert into user(phone,password) values (#{param1},#{param2})
+    </insert>
 
-<!-- 登录次数logins+1 -->
-<update id="addlogins" parameterType="String">
-update user set logins=1 where phone=#{phone};
-</update>
+    <!--用户登录验证-->
+    <select id="login" resultType="com.gotravel.entity.User" parameterType="String">
+        select * from user where phone=#{param1} and password=#{param2};
+    </select>
 
-<!--修改用户基本信息 -->
-<update id="editUser" parameterType="com.gotravel.model.User">
-update user set name=#{name} , gender=#{gender} , age=#{age} , image=#{image} where phone=#{phone};
-</update>
+    <!-- 状态变成激活 -->
+    <update id="editStatusToActive" parameterType="String">
+        update user set status=1 where phone=#{phone};
+    </update>
+
+    <!--修改用户基本信息 -->
+    <update id="editUser" parameterType="com.gotravel.entity.User">
+        update user set name=#{name} , gender=#{gender} , birthday=#{birthday} , image=#{image} where phone=#{phone};
+    </update>
 </mapper>

@@ -4,7 +4,7 @@
 package com.gotravel.dao.sqldao;
 
 
-import com.gotravel.model.User;
+import com.gotravel.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -21,14 +21,14 @@ import java.util.List;
 public interface UserDao {
 
 	/**
-	 * @Title check_phone_isexist
+	 * @Title check_phone_is_exist
 	 * @Description:TODO 检查是否已经存在phone
 	 * @Param [phone]
 	 * @return int
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  22:04
 	 **/
-	 int check_phone_isexist(String phone);
+	 int check_phone_is_exist(String phone);
 
 	/**
 	 * @Title register
@@ -53,14 +53,14 @@ public interface UserDao {
 
 
 	/**
-	 * @Title addlogins
-	 * @Description:TODO 登录次数logins+1，用于判断登录时候是否返回官方label
+	 * @Title editStatusToActive
+	 * @Description:TODO 将status状态变成激活状态
 	 * @Param [phone]
 	 * @return void
 	 * @Author: 陈一心
 	 * @Date: 2019/9/8  22:04
 	 **/
-	 void addlogins(String phone);
+	 void editStatusToActive(String phone);
 
 
 	/**

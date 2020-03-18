@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  *  @date 2019年8月9日 下午11:55:42
  */
 @RestController
-public class Usercontroller {
+public class UserController {
 
     @Autowired
     private UserService userService;
@@ -57,8 +57,8 @@ public class Usercontroller {
      * @Author: 陈一心
      * @Date: 2019/9/9  23:02
      **/
-    @RequestMapping(value = "/edit_userinfo", method = RequestMethod.POST)
-    public String edit_userinfo(@RequestParam String phone, @RequestParam String name, @RequestParam String gender, @RequestParam int age, @RequestParam String image) {
-        return userService.edit_userinfo(phone, name, gender, age, image);
+    @RequestMapping(value = "/editUserInfo", method = RequestMethod.POST)
+    public String editUserInfo(@RequestParam String phone, @RequestParam String name, @RequestParam String gender, @RequestParam String birthday, @RequestParam String image) throws Exception {
+        return userService.editUserInfo(phone, name, gender, birthday, image);
     }
 }

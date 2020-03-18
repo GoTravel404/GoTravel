@@ -3,7 +3,7 @@
  */
 package com.gotravel.common;
 
-import org.json.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,7 +53,7 @@ public class Common {
 			jsonObject.put("msg", message+"失败");
 			jsonObject.put("code", 100);    //保留，以后前端可能会用于其他功能的触发标准
 		}
-		return jsonObject.toString();
+		return jsonObject.toJSONString();
 	}
 
 	

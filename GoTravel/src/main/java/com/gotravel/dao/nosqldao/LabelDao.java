@@ -1,7 +1,7 @@
 package com.gotravel.dao.nosqldao;
 
 
-import com.gotravel.model.Label;
+import com.gotravel.entity.Label;
 
 import java.util.List;
 

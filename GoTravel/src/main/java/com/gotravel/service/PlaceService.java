@@ -11,7 +11,7 @@ public interface PlaceService {
 
 
     /**
-     * @Title findPlaceByuserlabel
+     * @Title findPlacesByUserLabel
      * @Description: TODO 根据用户的标签+地点设定的范围为用户提供景点且按好评度排序
      * @param phone 手机号
      * @param distance 范围
@@ -21,18 +21,18 @@ public interface PlaceService {
      * @Author: chenyx
      * @Date: 2019/9/21  10:11
      **/
-    String findPlaceByuserlabel(String phone, int distance, double lon, double lat);
+    String findPlacesByUserLabel(String phone, int distance, double lon, double lat);
 
 
     /**
-     * @Title findPlaceByplace_id
+     * @Title findPlacesByPlaceId
      * @Description:TODO 根据景点的place_id返回景点信息
      * @Param [place_id]
      * @return java.lang.String
      * @Author: 陈一心
      * @Date: 2019/9/9  22:45
      **/
-    String findPlaceByplace_id(int place_id);
+    String findPlacesByPlaceId(String place_id);
 
 
     /**

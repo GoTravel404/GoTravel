@@ -3,6 +3,8 @@
  */
 package com.gotravel.service;
 
+import java.text.ParseException;
+
 /**
  * @Description: TODO User用户基本信息表的Service接口
  * @date 2019年8月9日 下午11:58:12
@@ -33,13 +35,13 @@ public interface UserService {
 
 
     /**
-     * @Title edit_userinfo
+     * @Title editUserInfo
      * @Description: TODO 用户编辑基本信息
      * @Param [phone, name, gender, age, image]
      * @return java.lang.String
      * @Author: 陈一心
      * @Date: 2019/9/9  23:02
      **/
-    String edit_userinfo(String phone, String name, String gender, int age, String image);
+    String editUserInfo(String phone, String name, String gender, String birthday, String image) throws ParseException;
 
 }

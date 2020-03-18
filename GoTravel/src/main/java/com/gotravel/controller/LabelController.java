@@ -11,22 +11,23 @@ import org.springframework.web.bind.annotation.RestController;
  * @Description: TODO Label集合的所有操作接口
  *  @date 2019年8月4日 下午8:59:41
  */
+@RequestMapping("/goTravel/label")
 @RestController
-public class Labelcontroller {
+public class LabelController {
 
     @Autowired
     private LabelService labelService;
 
     /**
-     * @Title getlabel
+     * @Title getLabel
      * @Description:TODO 返回官方的标签；只返回了爱好和制定
      * @Param [request]
      * @return java.lang.String
      * @Author: 陈一心
      * @Date: 2019/9/8  21:17
      **/
-    @RequestMapping(value = "/getlabel", method = RequestMethod.GET)
-    public String getlabel() {
+    @RequestMapping(value = "/getLabel", method = RequestMethod.GET)
+    public String getLabel() {
         return labelService.getLabel();
     }
 
@@ -43,4 +44,5 @@ public class Labelcontroller {
     public String getAllLabel() {
         return labelService.getAllLabel();
     }
+
 }

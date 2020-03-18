@@ -1,7 +1,7 @@
 package com.gotravel.dao.nosqldao;
 
 
-import com.gotravel.model.Label;
+import com.gotravel.entity.Label;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -43,7 +43,6 @@ public class LabelDaoImpl implements LabelDao {
      **/
 	@Override
 	public List<Label> findLabel() {
-		// TODO Auto-generated method stub
 
 		//字符串序列化器
 		RedisSerializer redisSerializer=new StringRedisSerializer();

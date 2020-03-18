@@ -10,38 +10,39 @@ import java.util.Map;
  * @Description: TODO place集合的所有操作接口
  *  @date 2019年8月4日 下午10:41:02
  */
+@RequestMapping("/goTravel/place")
 @RestController
-public class Placescontroller {
+public class PlacesController {
 
     @Autowired
     private PlaceService placeService;
 
 
     /**
-     * @Title findPlacesByUserlabel
+     * @Title findPlacesByUserLabel
      * @Description: TODO 根据用户的标签+地点设定的范围为用户提供景点且按好评度排序
      * @Param [phone]
      * @return java.lang.String
      * @Author: 陈一心
      * @Date: 2019/9/9  22:57
      **/
-    @RequestMapping(value = "/findPlacesByUserlabel", method = RequestMethod.POST)
-    public String findPlaceByuserlabel(@RequestParam String phone, @RequestParam int distance, @RequestParam double lon, @RequestParam double lat) {
-        return placeService.findPlaceByuserlabel(phone, distance, lon, lat);
+    @RequestMapping(value = "/findPlacesByUserLabel", method = RequestMethod.POST)
+    public String findPlacesByUserLabel(@RequestParam String phone, @RequestParam int distance, @RequestParam double lon, @RequestParam double lat) {
+        return placeService.findPlacesByUserLabel(phone, distance, lon, lat);
     }
 
 
     /**
-     * @Title findPlaceByplace_id
+     * @Title findPlacesByPlaceId
      * @Description: TODO 根据景点的place_id返回景点信息
      * @Param [place_id]
      * @return java.lang.String
      * @Author: 陈一心
      * @Date: 2019/9/9  22:58
      **/
-    @RequestMapping(value = "/findPlacesByPlace_id", method = RequestMethod.GET)
-    public String findPlaceByplace_id(@RequestParam int place_id) {
-        return placeService.findPlaceByplace_id(place_id);
+    @RequestMapping(value = "/findPlacesByPlaceId", method = RequestMethod.GET)
+    public String findPlacesByPlaceId(@RequestParam String place_id) {
+        return placeService.findPlacesByPlaceId(place_id);
     }
 
 

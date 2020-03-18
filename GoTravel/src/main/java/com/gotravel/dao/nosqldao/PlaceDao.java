@@ -1,8 +1,7 @@
 package com.gotravel.dao.nosqldao;
 
 
-import com.gotravel.model.Place;
-import com.gotravel.model.User_detailed;
+import com.gotravel.entity.UserDetailed;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,7 @@ public interface PlaceDao {
 
 
     /**
-     * @Title findByuser_label
+     * @Title findByUserLabel
      * @Description: TODO 根据用户的标签+地点设定的范围为用户提供景点且按好评度排序
      * @param user_detailed 用户标签
      * @param distance 距离
@@ -26,18 +25,10 @@ public interface PlaceDao {
      * @Author: chenyx
      * @Date: 2019/9/21  10:20
      **/
-    List<Map<String, Object>> findByuser_label(User_detailed user_detailed, int distance, double lon, double lat);
+    List<Map<String, Object>> findByUserLabel(UserDetailed user_detailed, int distance, double lon, double lat);
 
 
-    /**
-     * @Title findPlaceByplace_id
-     * @Description:TODO 根据景点的place_id返回景点信息
-     * @Param [place_id]
-     * @return Place
-     * @Author: 陈一心
-     * @Date: 2019/9/8  21:50
-     **/
-    Place findPlaceByplace_id(int place_id);
+
 
 
     /**

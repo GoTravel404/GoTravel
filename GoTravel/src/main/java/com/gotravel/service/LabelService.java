@@ -1,9 +1,5 @@
 package com.gotravel.service;
 
-import com.gotravel.model.Label;
-
-import java.util.List;
-
 /**
  *
  * @Description: Label官方标签表的Service接口层
@@ -11,16 +7,6 @@ import java.util.List;
  */
 public interface LabelService {
 
-
-    /**
-     * @Title findLabel
-     * @Description:TODO 查找官方的所有标签
-     * @Param []
-     * @return java.util.List<Label>
-     * @Author: 陈一心
-     * @Date: 2019/9/8  22:09
-     **/
-    List<Label> findLabel();
 
 
     /**
