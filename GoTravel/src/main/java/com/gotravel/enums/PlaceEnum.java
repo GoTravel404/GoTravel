@@ -16,12 +16,7 @@ public enum PlaceEnum {
     //景点启用状态
     BAN(0, "禁用"),
     ACTIVE(1, "启用"),
-    ALL(2, "综合"),
-
-    //好评率
-    DISORDER(0, "无序"),
-    ASCENDING_ORDER(1, "升序"),
-    DESCENDING_ORDER(2, "降序");
+    ALL(2, "综合");
 
 
     private Integer code;

@@ -2,7 +2,6 @@ package com.gotravel.entity.node;
 
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,7 +13,7 @@ import java.util.List;
 }
 **/
 @Data
-public class MyPlan {
+public class MyPlan implements  Comparable<MyPlan>{
 
 	/**
 	 * 计划名称
@@ -29,11 +28,20 @@ public class MyPlan {
 	/**
 	 * 创建计划时间
 	 */
-	private Date time;
+	private long time;
 
-	public MyPlan(String plan_name, List<String> places_id, Date time) {
+
+	public MyPlan(String plan_name, List<String> places_id, long time) {
 		this.plan_name = plan_name;
 		this.places_id = places_id;
 		this.time = time;
 	}
+
+	@Override
+	public int compareTo(MyPlan o) {
+		//o.time代表List里第一个元素，this.time是List里第二个元
+
+		return Long.compare(o.time, this.time);
+	}
+
 }

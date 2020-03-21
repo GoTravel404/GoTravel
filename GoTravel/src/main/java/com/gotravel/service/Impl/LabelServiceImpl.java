@@ -1,15 +1,16 @@
 package com.gotravel.service.Impl;
 
 
-import com.alibaba.fastjson.JSONObject;
-import com.gotravel.dao.nosqldao.LabelDao;
+import com.gotravel.repository.redis.LabelRedis;
 import com.gotravel.entity.Label;
 import com.gotravel.service.LabelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: abel官方标签表的Service实现层
@@ -20,55 +21,31 @@ import java.util.List;
 public class LabelServiceImpl implements LabelService {
 
     @Autowired
-    private LabelDao labelDao;
-
-
-    /**
-     * @Title getLabel
-     * @Description:TODO 返回官方的标签
-     * @Param []
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/8  22:10
-     **/
-    @Override
-    public String getLabel() {
-
-        List<Label> labels = labelDao.findLabel();
-
-        List<String> label_hobby = labels.get(0).getHobby();
-        List<String> label_customization = labels.get(0).getCustomization();
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("label_hobby", label_hobby);
-        jsonObject.put("label_customization", label_customization);
-
-        return jsonObject.toJSONString();
-    }
+    private LabelRedis labelRedis;
 
 
     /**
      * @Title getAllLabel
-     * @Description: TODO 返回官方的所有标签
+     * @Description:  返回官方的所有标签
      * @param
-     * @return java.lang.String
+     * @Return: java.util.Map<java.lang.String, java.lang.Object>
      * @Author: chenyx
-     * @Date: 2019/12/11  11:28
+     * @Date: 2020/3/19 19:05
      **/
     @Override
-    public String getAllLabel() {
+    public Map<String, Object> getAllLabel() {
 
-        List<Label> labels = labelDao.findLabel();
+        Label label = labelRedis.findAllLabel();
 
-        List<String> label_hobby = labels.get(0).getHobby();
-        List<String> label_customization = labels.get(0).getCustomization();
-        List<String> label_place_type = labels.get(0).getPlace_type();
+        List<String> label_hobby = label.getHobby();
+        List<String> label_customization = label.getCustomization();
+        List<String> label_place_type = label.getPlace_type();
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("label_hobby", label_hobby);
-        jsonObject.put("label_customization", label_customization);
-        jsonObject.put("label_place_type", label_place_type);
+        Map<String, Object> map = new HashMap<>();
+        map.put("label_hobby", label_hobby);
+        map.put("label_customization", label_customization);
+        map.put("label_place_type", label_place_type);
 
-        return jsonObject.toJSONString();
+        return map;
     }
 }

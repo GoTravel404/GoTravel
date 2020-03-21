@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * @Name: RedisConfig
- * @Description:TODO
+ * @Description:
  * @Author:chenyx
  * @Date: 2020/3/6 10:16
  **/

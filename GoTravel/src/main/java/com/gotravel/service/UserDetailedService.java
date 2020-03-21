@@ -1,5 +1,6 @@
 package com.gotravel.service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -9,157 +10,125 @@ import java.util.Map;
 public interface UserDetailedService {
 
 
-	/**
-	 * @Title chooseLabel
-	 * @Description:TODO 用户选择个人标签
-	 * @Param [map]
-	 * @return java.lang.String
-	 * @Author: 陈一心
-	 * @Date: 2019/9/8  22:13
-	 **/
-     String chooseLabel(Map<String, Object> map);
-
-
-   /**
-    * @Title addMyCollections
-    * @Description: TODO 用户添加个人收藏景点
-    * @Param [phone, places_id, dateStr]
-    * @return java.lang.String
-    * @Author: 陈一心
-    * @Date: 2019/9/9  23:14
-    **/
-     String addMyCollections(String phone,String place_id,String time);
+    /**
+     * 用户选择个人标签
+     * @param map
+     * @return
+     */
+    void chooseLabel(Map<String, Object> map);
 
 
     /**
-     * @Title deleteMyCollections
-     * @Description: TODO 用户删除个人收藏景点
-     * @Param [phone, place_id]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:15
-     **/
-     String deleteMyCollections(String phone,String place_id);
+     * 用户添加个人收藏景点
+     * @param phone
+     * @param place_id
+     */
+    int addMyCollection(String phone, String place_id);
 
 
     /**
-     * @Title addMyPlan
-     * @Description:TODO 用户添加个人出行计划
-     * @Param [map]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/8  22:15
-     **/
-     String addMyPlan(Map<String, Object> map);
+     * 用户删除个人收藏景点
+     * @param phone
+     * @param place_id
+     * @return
+     */
+    int deleteMyCollection(String phone, String place_id);
 
 
     /**
-     * @Title editMyPlan
-     * @Description:TODO 用户编辑个人出行计划
-     * @Param [map]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/8  22:15
-     **/
-     String editMyPlan(Map<String, Object> map);
+     * 用户查找所有个人收藏的景点
+     * @param phone
+     * @return
+     */
+    List<Map<String, Object>> findMyCollections(String phone);
 
 
     /**
-     * @Title deleteMyPlan
-     * @Description: TODO 用户删除个人出行计划
-     * @Param [phone, time]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:24
-     **/
-     String deleteMyPlan(String phone,String time);
+     * 用户添加个人出行计划
+     * @param map
+     * @return
+     */
+    int addMyPlan(Map<String, Object> map);
 
 
     /**
-     * @Title addHistory
-     * @Description:TODO 用户到达景点后将景点添加到历史出行
-     * @Param [request]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/8  22:16
-     **/
-     String addHistory(String phone,String place_id,String time);
+     * 用户编辑个人出行计划
+     * @param map
+     * @return
+     */
+    int editMyPlan(Map<String, Object> map);
 
 
     /**
-     * @Title deleteHistoryPlace
-     * @Description:TODO 用户删除历史出行的单个景点
-     * @Param [request]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/8  22:16
-     **/
-     String deleteHistoryPlace(String phone,String place_id,String date);
+     * 用户删除个人出行计划
+     * @param phone
+     * @param time
+     * @return
+     */
+    int deleteMyPlan(String phone, long time);
 
 
     /**
-     * @Title deleteHistory
-     * @Description: TODO 用户删除历史出行记录
-     * @Param [phone, date]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:34
-     **/
-     String deleteHistory(String phone,String date);
+     * 用户查找所有出行计划(返回所有出行计划的名称列表)
+     * @param phone
+     * @return
+     */
+    List<Map<String, Object>> findMyPlans(String phone);
 
 
     /**
-     * @Title findMyCollections
-     * @Description: TODO 用户查找所有个人收藏的景点
-     * @Param [phone]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:36
-     **/
-     String findMyCollections(String phone);
+     * 用户根据计划制定的时间(time)查询出行计划详情列表
+     * @param phone
+     * @param time
+     * @return
+     */
+    Map<String, Object> findMyPlanDetailed(String phone, long time);
 
 
     /**
-     * @Title findMyHistories
-     * @Description: TODO 用户查找所有历史出行(返回所有日期的历史出行列表)
-     * @Param [phone]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:37
-     **/
-     String findMyHistories(String phone);
+     * 用户到达景点后将景点添加到历史出行
+     * @param phone
+     * @param place_id
+     * @return
+     */
+    int addHistory(String phone, String place_id);
 
 
     /**
-     * @Title findmyhistories_detailed
-     * @Description: TODO 用户根据日期查找某一天的历史出行详情列表
-     * @Param [phone, date]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:39
-     **/
-     String findMyHistoriesDetailed(String phone,String date);
+     * 用户删除历史出行的单个景点
+     * @param phone
+     * @param time
+     * @param date
+     * @return
+     */
+    int deleteHistoryPlace(String phone, long time, String date);
 
 
     /**
-     * @Title findMyPlans
-     * @Description: TODO 用户查找所有出行计划(返回所有出行计划的名称列表)
-     * @Param [phone]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:40
-     **/
-     String findMyPlans(String phone);
+     * 用户删除历史出行记录
+     * @param phone
+     * @param date
+     * @return
+     */
+    int deleteHistory(String phone, String date);
 
 
-   /**
-    * @Title findmyplans_detailed
-    * @Description: TODO 用户根据计划制定的时间(time)查询出行计划详情列表
-    * @Param [phone, time]
-    * @return java.lang.String
-    * @Author: 陈一心
-    * @Date: 2019/9/9  23:42
-    **/
-     String findMyPlansDetailed(String phone,String time);
+    /**
+     * 用户查找所有历史出行(返回所有日期的历史出行列表)
+     * @param phone
+     * @return
+     */
+    List<Map<String, Object>> findMyHistories(String phone);
+
+
+
+    /**
+     * 用户根据日期查找某一天的历史出行详情列表
+     * @param phone
+     * @param date
+     * @return
+     */
+    Map<String, Object> findMyHistoriesDetailed(String phone, String date);
+
 
 }

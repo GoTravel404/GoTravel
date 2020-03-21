@@ -1,4 +1,4 @@
-package com.gotravel.common.places_distance;
+package com.gotravel.utils;
 
 import com.gotravel.entity.Place;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import java.util.Map;
  * @Date:Create in  2019/9/20 15:46
  **/
 @Slf4j
-public class PlacesDistance {
+public class PlacesDistanceUtils {
 
     private static final double EARTH_RADIUS = 6378137;// 赤道半径(单位m)
 
@@ -90,14 +90,17 @@ public class PlacesDistance {
                 //int int_distance = Integer.parseInt(new java.text.DecimalFormat("0").format(sure_distance));//double转为int
 
                 if (sure_distance <= distance) { //地点在指定的范围
-//                    str += " " + sure_distance;
+                   // log.info(""+sure_distance);
                     Map<String, Object> map = new HashMap<>();
                     map.put("distance", sure_distance);
                     map.put("place", place);
                     placeList.add(map);
                 }
+
             }
+
         }
+
 
         return placeList;
     }

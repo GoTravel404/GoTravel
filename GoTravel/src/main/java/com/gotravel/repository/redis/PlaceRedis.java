@@ -1,10 +1,14 @@
-package com.gotravel.dao.redis;
+package com.gotravel.repository.redis;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.gotravel.entity.Place;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -41,41 +45,45 @@ public class PlaceRedis {
      * @Author: chenyx
      * @Date: 2019/9/21  17:20
      **/
-    public List getRedisAllPlacesList() {
+    public List<Place> getRedisAllPlacesList() {
 
         //查询缓存
-        List placesList = redisTemplate.opsForHash().values(REDIS_KEY);
+        List<Object> placesList = redisTemplate.opsForHash().values(REDIS_KEY);
+        JSONArray array = (JSONArray) JSONArray.toJSON(placesList);
+        List<Place> placesList_1 = JSONObject.parseArray(array.toJSONString(), Place.class);
 
         //双重检测锁
         if (0 == placesList.size()) {
             synchronized (this) {  //加锁
+
                 //从redis获取
-                // placesList = redisTemplate.opsForList().range(REDIS_KEY, 0, -1);
-                placesList=redisTemplate.opsForHash().values(REDIS_KEY);
+                placesList = redisTemplate.opsForHash().values(REDIS_KEY);
+                array = (JSONArray) JSONArray.toJSON(placesList);
+                placesList_1 = JSONObject.parseArray(array.toJSONString(), Place.class);
 
                 if (0 == placesList.size()) {   //缓存为空,查询一遍数据库
                     log.info("【查询数据库】");
 
-                    List<Place> placesList1 = mongoTemplate.findAll(Place.class);
+                    List<Place> placesList_2 = mongoTemplate.findAll(Place.class);
 
                     //将数据库查询出来的数据，存放到redis中
                     //使用redis的Hash存储
                     Map<String, Place> placeMap = new HashMap<>();
-                    for (Place place : placesList1) {
+                    for (Place place : placesList_2) {
 
-                        placeMap.put(String.valueOf(place.getPlace_id()),place);
+                        placeMap.put(String.valueOf(place.getPlace_id()), place);
                     }
-                    redisTemplate.opsForHash().putAll(REDIS_KEY,placeMap);
+                    redisTemplate.opsForHash().putAll(REDIS_KEY, placeMap);
 
-                    placesList=placesList1;
+                    return placesList_2;
 
                 }
+
             }
         }
 
-        return placesList;
+        return placesList_1;
     }
-
 
 
     /**
@@ -101,6 +109,42 @@ public class PlaceRedis {
         return JSONObject.toJavaObject(json, Place.class);
     }
 
+
+    /**
+     * @Title getPlaceListByPipeline
+     * @Description: TODO 根据通道一次性返回多个景点
+     * @param keyList
+     * @Return: java.util.List<java.lang.Object>
+     * @Author: chenyx
+     * @Date: 2020/3/6 12:13
+     **/
+    public List<Place> getPlaceListByPipeline(List<String> keyList) {
+
+        //查询缓存是否存在key
+        if (!redisTemplate.hasKey(REDIS_KEY)) {
+            log.info("【根据通道一次性返回多个景点】：缓存为空,添加缓存");
+            getRedisAllPlacesList();
+        }
+
+        List<Object> placeList = redisTemplate.executePipelined(new RedisCallback<Place>() {
+
+            @Override
+            public Place doInRedis(RedisConnection redisConnection) throws DataAccessException {
+                redisConnection.openPipeline();
+                for (String key : keyList) {
+                    redisConnection.hGet(REDIS_KEY.getBytes(), key.getBytes());
+                }
+                return null;
+            }
+        }, redisTemplate.getHashValueSerializer());
+
+
+        JSONArray array = (JSONArray) JSONArray.toJSON(placeList);
+
+        return JSONObject.parseArray(array.toJSONString(), Place.class);
+
+
+    }
 
 
 }

@@ -1,10 +1,11 @@
 package com.gotravel.exception;
 
-import org.json.JSONObject;
+import com.gotravel.enums.ResultEnum;
+import com.gotravel.utils.ResultVOUtil;
+import com.gotravel.vo.ResultVO;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * @ClassName:GlobalExceptionHandler
@@ -17,13 +18,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseBody
 public class GlobalExceptionHandler {
 
-        @ExceptionHandler
-        @ResponseStatus
-        public String runtimeExceptionHandler(Exception e){
-            JSONObject json = new JSONObject();
-            json.put("msg", "系统出错啦");
-            json.put("code", 500);
-            e.printStackTrace();
-            return json.toString();
+    @ExceptionHandler
+    //@ResponseStatus
+    public ResultVO runtimeExceptionHandler(Exception e) {
+
+        e.printStackTrace();
+
+        return ResultVOUtil.exception(ResultEnum.EXCEPTION.getCode(), ResultEnum.EXCEPTION.getMessage());
     }
+
+
 }

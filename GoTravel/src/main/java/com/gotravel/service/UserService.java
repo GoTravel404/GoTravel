@@ -3,6 +3,9 @@
  */
 package com.gotravel.service;
 
+import com.gotravel.entity.User;
+import com.gotravel.vo.ResultVO;
+
 import java.text.ParseException;
 
 /**
@@ -13,35 +16,34 @@ public interface UserService {
 
 
     /**
-     * @Title register
-     * @Description: TODO 用户注册走·旅行账号
-     * @Param [phone, password]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  22:53
-     **/
-    String register(String phone, String password);
+     * 用户注册走·旅行账号
+     * @param phone
+     * @param password
+     * @return
+     */
+    ResultVO register(String phone, String password);
 
-
-    /**
-     * @Title login
-     * @Description: TODO 用户登录走·旅行
-     * @Param [phone, password]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  22:52
-     **/
-    String login(String phone, String password);
 
 
     /**
-     * @Title editUserInfo
-     * @Description: TODO 用户编辑基本信息
-     * @Param [phone, name, gender, age, image]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:02
-     **/
-    String editUserInfo(String phone, String name, String gender, String birthday, String image) throws ParseException;
+     * 用户登录走·旅行
+     * @param phone
+     * @param password
+     * @return
+     */
+    ResultVO login(String phone, String password);
+
+
+    /**
+     * 用户编辑基本信息
+     * @param userId
+     * @param name
+     * @param gender
+     * @param birthday
+     * @param image
+     * @return
+     * @throws ParseException
+     */
+    User editUserInfo(Integer userId, String name, String gender, String birthday, String image);
 
 }

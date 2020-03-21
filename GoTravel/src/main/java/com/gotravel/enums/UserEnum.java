@@ -19,25 +19,19 @@ public enum UserEnum {
     ACTIVE(1, "激活"),
     BAN(2, "禁用"),
 
-    ALL_GENDER(-1, "全部性别"),
+    DEFAULT_NAME(0,"游客"),
+
     FEMALE(0, "女"),
     MALE(1, "男"),
-    SECRECY(2, "保密"),
-
-
-    ALL_AGE(-1, new Integer[]{0, 150}),
-    LESS_THAN_15(0, new Integer[]{0, 14}),
-    FORM_15_TO_30(1, new Integer[]{15, 30}),
-    FORM_31_TO_45(2, new Integer[]{31, 45}),
-    GREATER_THAN_45(3, new Integer[]{46, 150});
+    SECRECY(2, "保密");
 
 
     private Integer code;
 
-    private Object message;
+    private String message;
 
 
-    UserEnum(Integer code, Object message) {
+    UserEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

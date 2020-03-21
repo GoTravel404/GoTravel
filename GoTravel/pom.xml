@@ -11,7 +11,7 @@
 
     <groupId>com.GoTravel</groupId>
     <artifactId>gotravel</artifactId>
-    <version>1.1.1</version>
+    <version>2.0.0</version>
     <packaging>war</packaging>
     <name>gotravel</name>
     <description>走·旅行的前台接口</description>
@@ -24,6 +24,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
         <dependency>
@@ -84,6 +89,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork><!--热部署必须添加这个配置-->
+                </configuration>
             </plugin>
         </plugins>
 

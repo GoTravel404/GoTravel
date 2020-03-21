@@ -2,23 +2,30 @@
 package com.gotravel.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.*;
 import java.util.Date;
 
-/**
- * 用户信息表
- **/
 @Data
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "user", indexes = {@Index(columnList = "phone")})//设置索引
 public class User {
 
     /**
      * 唯一id
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
 
     /**
      * 手机号
      */
+
     private String phone;
 
     /**
@@ -51,17 +58,12 @@ public class User {
      */
     private Integer status;
 
-
+    @CreatedDate
     private Date createTime;
 
-
+    //如果没有修改任何字段的值的话，即便走了save方法，updateTime也是不会更改的
+    @LastModifiedDate
     private Date updateTime;
 
-    public User(String phone, String name, String gender, Date birthday, String image) {
-        this.phone = phone;
-        this.name = name;
-        this.gender = gender;
-        this.birthday = birthday;
-        this.image = image;
-    }
+
 }

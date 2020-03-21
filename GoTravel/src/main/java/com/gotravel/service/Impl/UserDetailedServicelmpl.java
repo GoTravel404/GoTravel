@@ -1,19 +1,21 @@
 package com.gotravel.service.Impl;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.gotravel.common.Common;
-import com.gotravel.dao.nosqldao.UserDetailedDao;
+import com.gotravel.entity.Place;
+import com.gotravel.entity.UserDetailed;
 import com.gotravel.entity.node.MyHistory;
 import com.gotravel.entity.node.MyPlan;
+import com.gotravel.entity.node.PlaceIdTime;
+import com.gotravel.enums.PlaceEnum;
+import com.gotravel.repository.nosqldao.UserDetailedDao;
+import com.gotravel.repository.redis.PlaceRedis;
 import com.gotravel.service.UserDetailedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Description: TODO User_Detailed用户信息详细表的service的实现类
@@ -26,300 +28,549 @@ public class UserDetailedServicelmpl implements UserDetailedService {
     @Autowired
     private UserDetailedDao userDetailedDao;
 
+    @Autowired
+    private PlaceRedis placeRedis;
+
+
     /**
      * @Title chooseLabel
-     * @Description:TODO 用户选择个人标签
-     * @Param [map] phone,hobby(List<String> ),customization(List<String> )
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/8  22:18
+     * @Description: 用户选择个人标签
+     * @param map phone,hobby,customization
+     * @Return: void
+     * @Author: chenyx
+     * @Date: 2020/3/20 15:59
      **/
     @SuppressWarnings("unchecked")
     @Override
-    public String chooseLabel(Map<String, Object> map) {
+    public void chooseLabel(Map<String, Object> map) {
 
         List<String> hobby = (List<String>) map.get("hobby");
         List<String> customization = (List<String>) map.get("customization");
         String phone = (String) map.get("phone");
 
         //编辑数据库
-        int modifiedCount = userDetailedDao.edit_label(phone, hobby, customization);
+        userDetailedDao.editLabel(phone, hobby, customization);
 
-        return Common.sendMessage(modifiedCount, "选择");
     }
 
 
     /**
-     * @Title addMyCollections
+     * @Title addMyCollection
      * @Description: TODO 用户添加个人收藏景点
-     * @Param [phone, places_id, dateStr]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:14
+     * @param phone
+     * @param place_id
+     * @Return: int
+     * @Author: chenyx
+     * @Date: 2020/3/20 17:48
      **/
     @Override
-    public String addMyCollections(String phone,String place_id,String time) {
-
-        //时间转换
-        Date toTime = Common.TimeConversion(time);
+    public int addMyCollection(String phone, String place_id) {
 
         //收藏添加到数据库
-        int modifiedCount = userDetailedDao.addMyCollections(phone, place_id, toTime);
+        return userDetailedDao.addMyCollection(phone, place_id);
 
-        return Common.sendMessage(modifiedCount, "收藏");
     }
 
 
     /**
-     * @Title deleteMyCollections
+     * @Title deleteMyCollection
      * @Description: TODO 用户删除个人收藏景点
-     * @Param [phone, place_id]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:15
+     * @param phone
+     * @param place_id
+     * @Return: int
+     * @Author: chenyx
+     * @Date: 2020/3/20 18:41
      **/
     @Override
-    public String deleteMyCollections(String phone,String place_id) {
+    public int deleteMyCollection(String phone, String place_id) {
 
         //数据库删除收藏
-        int modifiedCount = userDetailedDao.deleteMyCollections(phone, place_id);
+        return userDetailedDao.deleteMyCollection(phone, place_id);
 
-        return Common.sendMessage(modifiedCount, "删除");
+    }
+
+
+    /**
+     * @Title findMyCollections
+     * @Description: 用户查找所有个人收藏的景点
+     * @param phone
+     * @Return: java.util.List<java.util.Map < java.lang.String, java.lang.Object>>
+     * @Author: chenyx
+     * @Date: 2020/3/20 19:24
+     **/
+    @Override
+    public List<Map<String, Object>> findMyCollections(String phone) {
+
+        //根据phone查询所有个人收藏的景点
+        UserDetailed userDetailed = userDetailedDao.findMyCollections(phone);
+
+        if (null == userDetailed) {
+            return null;
+        }
+
+        List<PlaceIdTime> placeIdTimeList = userDetailed.getMyCollections();
+
+        if (null == placeIdTimeList || 0 == placeIdTimeList.size()) {
+            return null;
+        }
+
+        //转成placeId的List
+        List<String> placeIdList = placeIdTimeList.stream().map(PlaceIdTime::getPlace_id).collect(Collectors.toList());
+
+        //转成placeId，time的Map
+        Map<String, Long> place_IdAndTimeMap = placeIdTimeList.stream().collect(Collectors.toMap(PlaceIdTime::getPlace_id, PlaceIdTime::getTime));
+
+
+        //redis查询
+        List<Place> placeList = placeRedis.getPlaceListByPipeline(placeIdList);
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        if (!CollectionUtils.isEmpty(placeIdList)) {
+
+            for (Place place : placeList) {
+
+                if (null != place && PlaceEnum.ACTIVE.getCode() == place.getStatus()) {
+
+                    Map<String, Object> map = new HashMap<>();
+
+                    map.put("place_id", place.getPlace_id());
+                    map.put("name", place.getName());
+
+                    String picture = "";
+                    if (null != place.getPicture() && 0 != place.getPicture().size()) {
+                        picture = place.getPicture().get(0);
+                    }
+                    map.put("picture", picture);
+
+                    map.put("time", place_IdAndTimeMap.get(place.getPlace_id()));
+
+                    resultList.add(map);
+
+                }
+
+            }
+
+        }
+
+        return resultList;
+
     }
 
 
     /**
      * @Title addMyPlan
-     * @Description:TODO 用户添加个人出行计划
-     * @Param [map] phone	plan_name  places_id(List<Integer>)	time
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/8  22:19
+     * @Description: 用户添加个人出行计划
+     * @param map     phone,plan_name,places_id(List<Integer>)
+     * @Return: java.lang.String
+     * @Author: chenyx
+     * @Date: 2020/3/20 20:14
      **/
     @SuppressWarnings("unchecked")
     @Override
-    public String addMyPlan(Map<String, Object> map) {
+    public int addMyPlan(Map<String, Object> map) {
 
         String phone = (String) map.get("phone");
         String plan_name = (String) map.get("plan_name");
         List<String> places_id = (List<String>) map.get("places_id");
 
-        String dateStr = (String) map.get("time");
-        //时间转换
-        Date time = Common.TimeConversion(dateStr);
-
         //数据库添加个人出行计划
-        int modifiedCount = userDetailedDao.addMyPlan(phone, plan_name, places_id, time);
+        return userDetailedDao.addMyPlan(phone, plan_name, places_id);
 
-        return Common.sendMessage(modifiedCount, "添加");
     }
 
 
     /**
      * @Title editmyplans
      * @Description:TODO 用户编辑个人出行计划
-     * @Param [map] phone,plan_name,places_id(List<Integer>),	time
+     * @Param [map] phone,plan_name,place_ids(List<Integer>),time
      * @return java.lang.String
      * @Author: 陈一心
      * @Date: 2019/9/8  22:19
      **/
     @SuppressWarnings("unchecked")
     @Override
-    public String editMyPlan(Map<String, Object> map) {
+    public int editMyPlan(Map<String, Object> map) {
 
         String phone = (String) map.get("phone");
         String plan_name = (String) map.get("plan_name");
         List<String> places_id = (List<String>) map.get("places_id");
-        String dateStr = (String) map.get("time");
-
-        //时间转换
-        Date time = Common.TimeConversion(dateStr);
+        long time = (long) map.get("time");
 
         //数据库修改个人出行计划
-        int modifiedCount = userDetailedDao.editMyPlan(phone, plan_name, places_id, time);
+        return userDetailedDao.editMyPlan(phone, plan_name, places_id, time);
 
-        return Common.sendMessage(modifiedCount, "修改");
     }
 
 
     /**
      * @Title deleteMyPlan
-     * @Description: TODO 用户删除个人出行计划
-     * @Param [phone, time]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:21
+     * @Description: 用户删除个人出行计划
+     * @param phone
+     * @param time
+     * @Return: int
+     * @Author: chenyx
+     * @Date: 2020/3/20 22:14
      **/
     @Override
-    public String deleteMyPlan(String phone,String time) {
-
-        //时间转换
-        Date toTime = Common.TimeConversion(time);
+    public int deleteMyPlan(String phone, long time) {
 
         //数据库删除个人出行计划
-        int modifiedCount = userDetailedDao.deleteMyPlan(phone, toTime);
+        return userDetailedDao.deleteMyPlan(phone, time);
 
-        return Common.sendMessage(modifiedCount, "删除");
+    }
+
+
+    /**
+     * @Title findMyPlans
+     * @Description: 用户查找所有出行计划(返回所有出行计划的名称列表)
+     * @param phone
+     * @Return: java.util.List<java.util.Map < java.lang.String, java.lang.Object>>
+     * @Author: chenyx
+     * @Date: 2020/3/20 22:32
+     **/
+    @Override
+    public List<Map<String, Object>> findMyPlans(String phone) {
+
+        //数据库查询所有出行计划
+        UserDetailed userDetailed = userDetailedDao.findMyPlans(phone);
+
+        if (null == userDetailed) {
+            return null;
+        }
+
+        List<MyPlan> myPlans = userDetailed.getMyPlans();
+
+        if (null == myPlans) {
+            return null;
+        }
+
+        //按时间排序，时间最近的靠前
+        Collections.sort(myPlans);
+
+        //封装返回出行计划名称(plan_name) , 计划时间(time)的json数组类型数据
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        for (MyPlan myplan : myPlans) {
+
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("plan_name", myplan.getPlan_name());
+            map.put("time", myplan.getTime());
+
+            resultList.add(map);
+        }
+
+
+        return resultList;
+
+    }
+
+
+    /**
+     * @Title findMyPlanDetailed
+     * @Description: 用户根据计划制定的时间(time)查询出行计划详情列表
+     * @param phone
+     * @param time
+     * @Return: java.util.Map<java.lang.String, java.lang.Object>
+     * @Author: chenyx
+     * @Date: 2020/3/20 23:20
+     **/
+    @Override
+    public Map<String, Object> findMyPlanDetailed(String phone, long time) {
+
+        //数据库查询所有出行计划
+        UserDetailed userDetailed = userDetailedDao.findMyPlans(phone);
+
+        if (null == userDetailed) {
+            return null;
+        }
+
+        List<MyPlan> myPlans = userDetailed.getMyPlans();
+
+        if (null == myPlans) {
+            return null;
+        }
+
+        //是否匹配time
+        boolean match = false;
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        //匹配到对应time的计划
+        for (MyPlan myplan : myPlans) {
+
+            if (time == myplan.getTime()) {
+
+                //匹配到time
+                match = true;
+
+                //计划名称
+                resultMap.put("plan_name", myplan.getPlan_name());
+
+                //计划时间
+                resultMap.put("time", myplan.getTime());
+
+                List<String> placeIds = myplan.getPlaces_id();
+
+                if (null == placeIds) {
+                    return null;
+                }
+
+                //查询redis
+                List<Place> placeList = placeRedis.getPlaceListByPipeline(placeIds);
+
+                List<Map<String, Object>> resultList = new ArrayList<>();
+
+                if (!CollectionUtils.isEmpty(placeIds)) {
+
+                    for (Place place : placeList) {
+
+                        if (null != place) {
+
+                            Map<String, Object> map = new HashMap<>();
+
+                            map.put("place_id", place.getPlace_id());
+                            map.put("name", place.getName());
+                            map.put("praise", place.getPraise());
+
+                            String picture = "";
+                            if (null != place.getPicture() && 0 != place.getPicture().size()) {
+                                picture = place.getPicture().get(0);
+                            }
+                            map.put("picture", picture);
+
+                            resultList.add(map);
+
+                        }
+
+                    }
+
+                }
+
+                //计划的景点
+                resultMap.put("places", resultList);
+
+            }
+
+        }
+
+        //没有匹配到time
+        if (!match) {
+            return null;
+        }
+
+        return resultMap;
+
     }
 
 
     /**
      * @Title addHistory
-     * @Description: TODO 用户到达景点后将景点添加到历史出行
-     * @Param [phone, place_id, time]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:27
+     * @Description: 用户到达景点后将景点添加到历史出行
+     * @param phone
+     * @param place_id
+     * @Return: int
+     * @Author: chenyx
+     * @Date: 2020/3/21 19:51
      **/
     @Override
-    public String addHistory(String phone,String place_id,String time) {
+    public int addHistory(String phone, String place_id) {
 
         //数据库添加个人历史出行
-        int modifiedCount = userDetailedDao.addHistory(phone, place_id, time);
+        return userDetailedDao.addHistory(phone, place_id);
 
-        return Common.sendMessage(modifiedCount, "添加");
     }
 
 
     /**
      * @Title deleteHistoryPlace
-     * @Description: TODO 用户删除历史出行的单个景点
-     * @Param [phone, place_id, date]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:30
+     * @Description: 用户删除历史出行的单个景点
+     * @param phone
+     * @param time
+     * @param date
+     * @Return: int
+     * @Author: chenyx
+     * @Date: 2020/3/21 20:34
      **/
     @Override
-    public String deleteHistoryPlace(String phone,String place_id,String date) {
+    public int deleteHistoryPlace(String phone, long time, String date) {
 
         //数据库删除历史出行的单个景点
-        int modifiedCount = userDetailedDao.deleteHistoryPlace(phone, place_id, date);
+        return userDetailedDao.deleteHistoryPlace(phone, time, date);
 
-        return Common.sendMessage(modifiedCount, "删除");
     }
 
 
     /**
      * @Title deleteHistory
-     * @Description: TODO 用户删除历史出行记录
-     * @Param [phone, date]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:34
+     * @Description: 用户删除历史出行记录
+     * @param phone
+     * @param date
+     * @Return: int
+     * @Author: chenyx
+     * @Date: 2020/3/21 21:29
      **/
     @Override
-    public String deleteHistory(String phone,String date) {
+    public int deleteHistory(String phone, String date) {
 
         //数据库删除历史出行记录
-        int modifiedCount = userDetailedDao.deleteHistory(phone, date);
+        return userDetailedDao.deleteHistory(phone, date);
 
-        return Common.sendMessage(modifiedCount, "删除");
-    }
-
-
-     /**
-      * @Title findMyCollections
-      * @Description: TODO 用户查找所有个人收藏的景点
-      * @Param [phone]
-      * @return java.lang.String
-      * @Author: 陈一心
-      * @Date: 2019/9/9  23:36
-      **/
-    @Override
-    public String findMyCollections(String phone) {
-
-        //数据库联表(user_detailed和place)查询个人收藏景点
-        return userDetailedDao.findMyCollections(phone);
     }
 
 
     /**
      * @Title findMyHistories
-     * @Description: TODO 用户查找所有历史出行(返回所有日期的历史出行列表)
-     * @Param [phone]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:37
+     * @Description: 用户查找所有历史出行(返回所有日期的历史出行列表)
+     * @param phone
+     * @Return: java.util.List<java.util.Map < java.lang.String, java.lang.Object>>
+     * @Author: chenyx
+     * @Date: 2020/3/21 21:57
      **/
     @Override
-    public String findMyHistories(String phone) {
+    public List<Map<String, Object>> findMyHistories(String phone) {
 
         //数据库查询所有历史出行
-        List<MyHistory> myhistories = userDetailedDao.findMyHistories(phone);
-        //封装返回出行日期(date) , 浏览景点数量(place_number)的json数组类型数据
+        UserDetailed userDetailed = userDetailedDao.findMyHistories(phone);
 
-        JSONArray jsonArray = new JSONArray();
-        for (Object myhistoryObject : myhistories) {
-            MyHistory myhistory = (MyHistory) myhistoryObject;
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("date", myhistory.getDate());
-            jsonObject.put("place_number", myhistory.getPlaces_time().size());
-            jsonArray.add(jsonObject);
+
+        if (null == userDetailed) {
+            return null;
         }
-        //返回json数组类型
-        return jsonArray.toString();
+
+        if (null == userDetailed.getMyHistories() || 0 == userDetailed.getMyHistories().size()) {
+            return null;
+        }
+
+
+        List<Map<String, Object>> resultMap = new ArrayList<>();
+
+        //封装返回出行日期(date) , 浏览景点数量(place_number)的json数组类型数据
+        for (MyHistory myhistory : userDetailed.getMyHistories()) {
+
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("date", myhistory.getDate());
+            map.put("place_number", myhistory.getPlaces_time().size());
+
+            resultMap.add(map);
+
+        }
+
+        return resultMap;
+
     }
 
 
-   /**
-    * @Title findMyHistoriesDetailed
-    * @Description: TODO 用户根据日期查找某一天的历史出行详情列表
-    * @Param [phone, date]
-    * @return java.lang.String
-    * @Author: 陈一心
-    * @Date: 2019/9/9  23:39
-    **/
+    /**
+     * @Title findMyHistoriesDetailed
+     * @Description: 用户根据日期查找某一天的历史出行详情列表
+     * @param phone
+     * @param date
+     * @Return: java.util.Map<java.lang.String, java.lang.Object>
+     * @Author: chenyx
+     * @Date: 2020/3/21 22:39
+     **/
     @Override
-    public String findMyHistoriesDetailed(String phone,String date) {
+    public Map<String, Object> findMyHistoriesDetailed(String phone, String date) {
 
         //数据库返回历史出行详情
-        return userDetailedDao.findMyHistoriesDetailed(phone, date);
-    }
+        UserDetailed userDetailed = userDetailedDao.findMyHistories(phone);
 
-
-    /**
-     * @Title findmyplans
-     * @Description: TODO 用户查找所有出行计划(返回所有出行计划的名称列表)
-     * @Param [phone]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:41
-     **/
-    @Override
-    public String findMyPlans(String phone) {
-
-        //数据库查询所有出行计划的名称列表
-        List<MyPlan> myplans = userDetailedDao.findMyPlans(phone);
-        //封装返回出行计划名称(plan_name) , 计划时间(time)的json数组类型数据
-        JSONArray jsonArray = new JSONArray();
-        for (Object myplanObject : myplans) {
-            MyPlan myplan = (MyPlan) myplanObject;
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("plan_name", myplan.getPlan_name());
-            jsonObject.put("time", myplan.getTime());
-            jsonArray.add(jsonObject);
+        if (null == userDetailed) {
+            return null;
         }
-        //返回json数组类型
-        return jsonArray.toString();
-    }
+
+        if (null == userDetailed.getMyHistories() || 0 == userDetailed.getMyHistories().size()) {
+            return null;
+        }
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        //是否匹配date
+        boolean match = false;
 
 
-    /**
-     * @Title findMyPlansDetailed
-     * @Description: TODO 用户根据计划制定的时间(time)查询出行计划详情列表
-     * @Param [phone, time]
-     * @return java.lang.String
-     * @Author: 陈一心
-     * @Date: 2019/9/9  23:42
-     **/
-    @Override
-    public String findMyPlansDetailed(String phone,String time) {
+        for (MyHistory myhistory : userDetailed.getMyHistories()) {
 
-        //时间转换
-        Date totime = Common.TimeConversion(time);
+            if (myhistory.getDate().equals(date)) {
 
-        //数据库查找个人出行计划详情
-        return userDetailedDao.findMyPlansDetailed(phone, totime);
+                //匹配到date
+                match = true;
+
+                //历史出行的日期
+                resultMap.put("date", myhistory.getDate());
+
+                //获取当天的所有的出行景点id与时间戳
+                List<PlaceIdTime> placeIdTimeList = myhistory.getPlaces_time();
+
+                //获取的所有的景点id
+                List<String> placeIdList = placeIdTimeList.stream().map(PlaceIdTime::getPlace_id).collect(Collectors.toList());
+
+                if (0 == placeIdList.size()) {
+                    return null;
+                }
+
+                //redis查询景点
+                List<Place> placeList = placeRedis.getPlaceListByPipeline(placeIdList);
+
+                //转成place_id，Place的Map,存在重复的key时，选择最后的key
+                Map<String, Place> place_IdAndPlaceMap = placeList.stream().collect(Collectors.toMap(Place::getPlace_id, u -> u, (u1, u2) -> u2));
+
+                if (0 == placeIdList.size()) {
+                    return null;
+                }
+
+
+                //到达的景点List
+                List<Map<String, Object>> resultList = new ArrayList<>();
+
+                for (PlaceIdTime placeIdTime : placeIdTimeList) {
+
+                    if (null != placeIdTime) {
+
+                        Place place = place_IdAndPlaceMap.get(placeIdTime.getPlace_id());
+
+                        if (null != place) {
+
+                            //每个景点的信息
+                            Map<String, Object> map = new HashMap<>();
+
+                            map.put("place_id", placeIdTime.getPlace_id());
+
+                            map.put("name", place.getName());
+                            map.put("praise", place.getPraise());
+
+                            String picture = "";
+                            if (null != place.getPicture() && 0 != place.getPicture().size()) {
+                                picture = place.getPicture().get(0);
+                            }
+                            map.put("picture", picture);
+
+                            //景点达到的时间
+                            map.put("time", placeIdTime.getTime());
+
+                            resultList.add(map);
+                        }
+                    }
+
+                }
+
+                //到达的景点
+                resultMap.put("places", resultList);
+
+            }
+
+        }
+
+        //没有匹配到date
+        if (!match) {
+            return null;
+        }
+
+        return resultMap;
 
     }
 
