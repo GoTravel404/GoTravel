@@ -29,8 +29,10 @@ public enum ResultEnum {
     DELETE_PLAN_ERROR(404,"删除计划失败"),
 
     ADD_HISTORY_ERROR(405,"添加历史出行失败"),
-    DELETE_HISTORY_PLACE_ERROR(405,"删除历史出行单个景点失败"),
-    DELETE_HISTORY__ERROR(406,"删除历史出行记录失败"),
+    DELETE_HISTORY_PLACE_ERROR(406,"删除历史出行单个景点失败"),
+    DELETE_HISTORY__ERROR(407,"删除历史出行记录失败"),
+
+    INCREASE_PLACE_PRAISE(600,"景点添加好评失败"),
 
     EXCEPTION(500,"系统出错啦");
 

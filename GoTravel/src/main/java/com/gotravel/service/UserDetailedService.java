@@ -86,6 +86,15 @@ public interface UserDetailedService {
 
 
     /**
+     * 用户根据手机号+出行计划的名称查询计划列表
+     * @param phone
+     * @param plan_name
+     * @return
+     */
+    List<Map<String, Object>> searchMyPlanByPhoneAndPlanName(String phone, String plan_name);
+
+
+    /**
      * 用户到达景点后将景点添加到历史出行
      * @param phone
      * @param place_id

@@ -79,9 +79,10 @@ public interface UserDetailedDao {
      * @param phone
      * @param plan_name
      * @param places_id
+     * @param postscript
      * @return
      */
-    int addMyPlan(String phone, String plan_name, List<String> places_id);
+    int addMyPlan(String phone, String plan_name, List<String> places_id,String postscript);
 
 
     /**
@@ -90,9 +91,10 @@ public interface UserDetailedDao {
      * @param plan_name
      * @param places_id
      * @param time
+     * @param postscript
      * @return
      */
-    int editMyPlan(String phone, String plan_name, List<String> places_id, long time);
+    int editMyPlan(String phone, String plan_name, List<String> places_id, long time,String postscript);
 
 
     /**

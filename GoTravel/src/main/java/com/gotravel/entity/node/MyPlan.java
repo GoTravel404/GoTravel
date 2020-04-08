@@ -26,14 +26,20 @@ public class MyPlan implements  Comparable<MyPlan>{
 	private List<String> places_id;
 
 	/**
+	 *  计划备注
+	 */
+	private String postscript;
+
+	/**
 	 * 创建计划时间
 	 */
 	private long time;
 
 
-	public MyPlan(String plan_name, List<String> places_id, long time) {
+	public MyPlan(String plan_name, List<String> places_id,String postscript, long time) {
 		this.plan_name = plan_name;
 		this.places_id = places_id;
+		this.postscript = postscript;
 		this.time = time;
 	}
 

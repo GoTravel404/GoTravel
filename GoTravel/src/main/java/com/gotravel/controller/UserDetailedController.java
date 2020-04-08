@@ -120,7 +120,7 @@ public class UserDetailedController {
     /**
      * @Title addMyPlan
      * @Description: 用户添加个人出行计划
-     * @param map     phone,plan_name,place_ids(List<Integer>)
+     * @param map     phone,plan_name,place_ids(List<Integer>),postscript
      * @Return: com.gotravel.vo.ResultVO
      * @Author: chenyx
      * @Date: 2020/3/20 19:59
@@ -144,7 +144,7 @@ public class UserDetailedController {
     /**
      * @Title editMyPlan
      * @Description: 用户编辑个人出行计划
-     * @param map    phone,plan_name,places_id(List<Integer>),time
+     * @param map    phone,plan_name,places_id(List<Integer>),time,postscript
      * @Return: com.gotravel.vo.ResultVO
      * @Author: chenyx
      * @Date: 2020/3/20 20:30
@@ -236,6 +236,29 @@ public class UserDetailedController {
 
         return ResultVOUtil.success(resultMap);
 
+    }
+
+
+
+    /**
+     * @Title searchMyPlanByPhoneAndPlanName
+     * @Description: 用户根据手机号+出行计划的名称查询计划列表
+     * @param phone
+     * @param plan_name
+     * @Return: com.gotravel.vo.ResultVO
+     * @Author: chenyx
+     * @Date: 2020/4/8 17:33
+     **/
+    @RequestMapping(value = "/searchMyPlanByPhoneAndPlanName", method = RequestMethod.POST)
+    public ResultVO searchMyPlanByPhoneAndPlanName(@RequestParam String phone, @RequestParam String plan_name){
+
+        List<Map<String, Object>> resultList = userDetailedService.searchMyPlanByPhoneAndPlanName(phone,plan_name);
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        resultMap.put("plans", resultList);
+
+        return ResultVOUtil.success(resultMap);
     }
 
 

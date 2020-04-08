@@ -40,11 +40,13 @@ public class LabelServiceImpl implements LabelService {
         List<String> label_hobby = label.getHobby();
         List<String> label_customization = label.getCustomization();
         List<String> label_place_type = label.getPlace_type();
+        List<String> label_range=label.getRange();
 
         Map<String, Object> map = new HashMap<>();
         map.put("label_hobby", label_hobby);
         map.put("label_customization", label_customization);
         map.put("label_place_type", label_place_type);
+        map.put("label_range", label_range);
 
         return map;
     }

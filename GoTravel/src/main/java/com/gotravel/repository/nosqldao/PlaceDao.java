@@ -31,4 +31,11 @@ public interface PlaceDao {
      */
     List<Place> findPlacesByPlaceLabel(List<String> hobby, List<String> customization, List<String> place_type);
 
+
+    /**
+     * 景点添加好评
+     * @param place_id
+     * @return
+     */
+    int increasePlacePraise(String place_id);
 }

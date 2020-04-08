@@ -35,5 +35,9 @@ public class Label implements Serializable {
 	 */
 	private  List<String> place_type;
 
+	/**
+	 * 范围
+	 */
+	private  List<String> range;
 
 }

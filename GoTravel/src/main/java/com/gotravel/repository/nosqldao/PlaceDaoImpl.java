@@ -1,10 +1,11 @@
 package com.gotravel.repository.nosqldao;
 
-import com.gotravel.repository.redis.PlaceRedis;
 import com.gotravel.entity.Place;
 import com.gotravel.entity.UserDetailed;
 import com.gotravel.enums.PlaceEnum;
+import com.gotravel.repository.redis.PlaceRedis;
 import com.gotravel.utils.OtherUtils;
+import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -111,6 +113,30 @@ public class PlaceDaoImpl implements PlaceDao {
 
     }
 
+
+
+    /**
+     * @Title increasePlacePraise
+     * @Description: 景点添加好评
+     * @param place_id
+     * @Return: int
+     * @Author: chenyx
+     * @Date: 2020/3/29 11:52
+     **/
+    @Override
+    public int increasePlacePraise(String place_id) {
+
+        Query query = new Query(Criteria.where("place_id").is(place_id));
+
+        Place place=mongoTemplate.findOne(query,Place.class);
+
+        Update update = new Update().set("praise", place.getPraise()+1);
+
+        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, Place.class);
+
+        return (int) updateResult.getModifiedCount();
+
+    }
 
 
 }

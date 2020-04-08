@@ -37,17 +37,17 @@ public class PlaceServiceImpl implements PlaceService {
 
     /**
      * @Title findPlacesByUserLabel
-     * @Description:  根据用户的标签+地点设定的范围为用户提供景点且按好评度排序
+     * @Description: 根据用户的标签+地点设定的范围为用户提供景点且按好评度排序
      * @param phone
      * @param distance
      * @param lon
      * @param lat
-     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+     * @Return: java.util.Map<java.lang.String, java.lang.Object>
      * @Author: chenyx
      * @Date: 2020/3/19 19:32
      **/
     @Override
-    public  Map<String,Object> findPlacesByUserLabel(String phone, int distance, double lon, double lat) {
+    public Map<String, Object> findPlacesByUserLabel(String phone, int distance, double lon, double lat) {
 
         //数据库根据phone返回该用户的详细信息
         UserDetailed user_detailed = userDetailedDao.findByPhone(phone);
@@ -61,7 +61,7 @@ public class PlaceServiceImpl implements PlaceService {
         //返回用户收藏的景点Id
         List<String> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
 
-        Map<String,Object> map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
 
         map.put("places", places);
         map.put("collectionsPlaceIds", collectionsPlaceIds);
@@ -72,7 +72,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     /**
      * @Title findPlaceByPlaceId
-     * @Description:  根据景点的place_id返回景点信息
+     * @Description: 根据景点的place_id返回景点信息
      * @param place_id
      * @Return: com.gotravel.entity.Place
      * @Author: chenyx
@@ -88,7 +88,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     /**
      * @Title findPlacesByPlaceLabel
-     * @Description:  根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)+地点设定的范围返回景点信息且按好评度排序
+     * @Description: 根据景点的Label(封装成三组List类型 ， 有List < hobby > 、 List < customization > 、 List < place_type >)+地点设定的范围返回景点信息且按好评度排序
      * @param map List<hobby>，List<customization>，List<place_type> ，distance 距离 ，lon 经度 ，lat 维度 , phone 手机号
      * @return java.lang.String
      * @Author: chenyx
@@ -96,7 +96,7 @@ public class PlaceServiceImpl implements PlaceService {
      **/
     @Override
     @SuppressWarnings("unchecked")
-    public  Map<String,Object> findPlacesByPlaceLabel(Map<String, Object> map) {
+    public Map<String, Object> findPlacesByPlaceLabel(Map<String, Object> map) {
 
         String phone = (String) map.get("phone");
         List<String> hobby = (List<String>) map.get("hobby");
@@ -108,14 +108,14 @@ public class PlaceServiceImpl implements PlaceService {
         double lat = (double) map.get("lat");
 
         //根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)返回景点信息且按好评度排序
-       List<Place> placeList = placeDao.findPlacesByPlaceLabel(hobby, customization, place_type);
+        List<Place> placeList = placeDao.findPlacesByPlaceLabel(hobby, customization, place_type);
 
         //匹配符合距离范围的景点
         List<Map<String, Object>> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
 
         List<String> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
 
-        Map<String,Object> resultMap=new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
 
         resultMap.put("places", places);
         resultMap.put("collectionsPlaceIds", collectionsPlaceIds);
@@ -126,12 +126,12 @@ public class PlaceServiceImpl implements PlaceService {
 
     /**
      * @Title findPlacesByPraise
-     * @Description:  根据好评度(热门)+地点设定的范围返回景点信息且按好评度排序
+     * @Description: 根据好评度(热门)+地点设定的范围返回景点信息且按好评度排序
      * @param phone
      * @param distance
      * @param lon
      * @param lat
-     * @Return: java.util.Map<java.lang.String,java.lang.Object>
+     * @Return: java.util.Map<java.lang.String, java.lang.Object>
      * @Author: chenyx
      * @Date: 2020/3/19 22:27
      **/
@@ -149,12 +149,27 @@ public class PlaceServiceImpl implements PlaceService {
 
         List<String> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
 
-        Map<String,Object> resultMap=new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
 
         resultMap.put("places", places);
         resultMap.put("collectionsPlaceIds", collectionsPlaceIds);
 
         return resultMap;
+    }
+
+
+    /**
+     * @Title increasePlacePraise
+     * @Description: 景点添加好评
+     * @param place_id
+     * @Return: int
+     * @Author: chenyx
+     * @Date: 2020/3/29 11:47
+     **/
+    @Override
+    public int increasePlacePraise(String place_id) {
+
+        return placeDao.increasePlacePraise(place_id);
     }
 
 }

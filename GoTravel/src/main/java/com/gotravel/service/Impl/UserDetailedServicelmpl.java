@@ -9,6 +9,7 @@ import com.gotravel.enums.PlaceEnum;
 import com.gotravel.repository.nosqldao.UserDetailedDao;
 import com.gotravel.repository.redis.PlaceRedis;
 import com.gotravel.service.UserDetailedService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -161,7 +162,7 @@ public class UserDetailedServicelmpl implements UserDetailedService {
     /**
      * @Title addMyPlan
      * @Description: 用户添加个人出行计划
-     * @param map     phone,plan_name,places_id(List<Integer>)
+     * @param map     phone,plan_name,places_id(List<Integer>),postscript
      * @Return: java.lang.String
      * @Author: chenyx
      * @Date: 2020/3/20 20:14
@@ -173,9 +174,18 @@ public class UserDetailedServicelmpl implements UserDetailedService {
         String phone = (String) map.get("phone");
         String plan_name = (String) map.get("plan_name");
         List<String> places_id = (List<String>) map.get("places_id");
+        String postscript = (String) map.get("postscript");
+
+        if (StringUtils.isBlank(phone) || StringUtils.isBlank(plan_name) || places_id.isEmpty()) {
+            return 0;
+        }
+
+        if (null == postscript)
+            postscript = "";
+
 
         //数据库添加个人出行计划
-        return userDetailedDao.addMyPlan(phone, plan_name, places_id);
+        return userDetailedDao.addMyPlan(phone, plan_name, places_id, postscript);
 
     }
 
@@ -183,7 +193,7 @@ public class UserDetailedServicelmpl implements UserDetailedService {
     /**
      * @Title editmyplans
      * @Description:TODO 用户编辑个人出行计划
-     * @Param [map] phone,plan_name,place_ids(List<Integer>),time
+     * @Param [map] phone,plan_name,place_ids(List<Integer>),time,postscript
      * @return java.lang.String
      * @Author: 陈一心
      * @Date: 2019/9/8  22:19
@@ -192,13 +202,23 @@ public class UserDetailedServicelmpl implements UserDetailedService {
     @Override
     public int editMyPlan(Map<String, Object> map) {
 
+
         String phone = (String) map.get("phone");
         String plan_name = (String) map.get("plan_name");
         List<String> places_id = (List<String>) map.get("places_id");
-        long time = (long) map.get("time");
+        String postscript = (String) map.get("postscript");
+        Long time = (Long) map.get("time");
+
+        if (StringUtils.isBlank(phone) || StringUtils.isBlank(plan_name) || time == null) {
+            return 0;
+        }
+
+        if (null == postscript)
+            postscript = "";
+
 
         //数据库修改个人出行计划
-        return userDetailedDao.editMyPlan(phone, plan_name, places_id, time);
+        return userDetailedDao.editMyPlan(phone, plan_name, places_id, time, postscript);
 
     }
 
@@ -258,6 +278,7 @@ public class UserDetailedServicelmpl implements UserDetailedService {
 
             map.put("plan_name", myplan.getPlan_name());
             map.put("time", myplan.getTime());
+            map.put("postscript", myplan.getPostscript());
 
             resultList.add(map);
         }
@@ -308,6 +329,9 @@ public class UserDetailedServicelmpl implements UserDetailedService {
 
                 //计划名称
                 resultMap.put("plan_name", myplan.getPlan_name());
+
+                //计划备注
+                resultMap.put("postscript", myplan.getPostscript());
 
                 //计划时间
                 resultMap.put("time", myplan.getTime());
@@ -362,6 +386,63 @@ public class UserDetailedServicelmpl implements UserDetailedService {
         }
 
         return resultMap;
+
+    }
+
+
+    /**
+     * @Title searchMyPlanByPhoneAndPlanName
+     * @Description: 用户根据手机号+出行计划的名称查询计划列表
+     * @param phone
+     * @param plan_name
+     * @Return: java.util.List<java.util.Map < java.lang.String, java.lang.Object>>
+     * @Author: chenyx
+     * @Date: 2020/4/8 17:36
+     **/
+    @Override
+    public List<Map<String, Object>> searchMyPlanByPhoneAndPlanName(String phone, String plan_name) {
+
+        //数据库查询所有出行计划
+        UserDetailed userDetailed = userDetailedDao.findMyPlans(phone);
+
+        if (null == userDetailed) {
+            return null;
+        }
+
+        List<MyPlan> myPlans = userDetailed.getMyPlans();
+
+        if (null == myPlans) {
+            return null;
+        }
+
+        //按时间排序，时间最近的靠前
+        Collections.sort(myPlans);
+
+        //封装返回出行计划名称(plan_name) , 计划时间(time)的json数组类型数据
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        for (MyPlan myplan : myPlans) {
+
+            //出行计划的名称模糊匹配
+            if (myplan.getPlan_name().contains(plan_name)) {
+
+                Map<String, Object> map = new HashMap<>();
+
+                map.put("plan_name", myplan.getPlan_name());
+                map.put("time", myplan.getTime());
+                map.put("postscript", myplan.getPostscript());
+
+                resultList.add(map);
+            }
+
+        }
+
+        if(resultList.isEmpty()){
+            return null;
+        }
+
+        return resultList;
 
     }
 

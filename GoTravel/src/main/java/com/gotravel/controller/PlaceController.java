@@ -114,4 +114,29 @@ public class PlaceController {
     }
 
 
+
+    /**
+     * @Title increasePlacePraise
+     * @Description: 景点添加好评
+     * @param place_id
+     * @Return: com.gotravel.vo.ResultVO
+     * @Author: chenyx
+     * @Date: 2020/3/29 11:46
+     **/
+    @RequestMapping(value = "/increasePlacePraise",method = RequestMethod.GET)
+    public ResultVO increasePlacePraise(@RequestParam String place_id){
+
+        int modifiedCount = placeService.increasePlacePraise(place_id);
+
+        if (modifiedCount > 0) {
+
+            return ResultVOUtil.success();
+        } else {
+
+            return ResultVOUtil.error(ResultEnum.INCREASE_PLACE_PRAISE.getCode(), ResultEnum.INCREASE_PLACE_PRAISE.getMessage());
+        }
+
+    }
+
+
 }

@@ -192,16 +192,17 @@ public class UserDetailedDaoImpl implements UserDetailedDao {
      * @param phone
      * @param plan_name
      * @param places_id
+     * @param postscript
      * @Return: int
      * @Author: chenyx
      * @Date: 2020/3/20 20:24
      **/
     @Override
-    public int addMyPlan(String phone, String plan_name, List<String> places_id) {
+    public int addMyPlan(String phone, String plan_name, List<String> places_id, String postscript) {
 
         Query query = new Query(Criteria.where("phone").is(phone));
 
-        MyPlan myplan = new MyPlan(plan_name, places_id, System.currentTimeMillis());
+        MyPlan myplan = new MyPlan(plan_name, places_id, postscript, System.currentTimeMillis());
         Update update = new Update().push("myplans", myplan);
 
         UpdateResult updateResult = mongoTemplate.updateFirst(query, update, UserDetailed.class);
@@ -218,16 +219,17 @@ public class UserDetailedDaoImpl implements UserDetailedDao {
      * @param plan_name
      * @param places_id
      * @param time
+     * @param postscript
      * @Return: int
      * @Author: chenyx
      * @Date: 2020/3/20 20:39
      **/
     @Override
-    public int editMyPlan(String phone, String plan_name, List<String> places_id, long time) {
+    public int editMyPlan(String phone, String plan_name, List<String> places_id, long time,String postscript) {
 
         Query query = new Query(Criteria.where("phone").is(phone).and("myplans.time").is(time));
 
-        Update update = new Update().set("myplans.$.places_id", places_id).set("myplans.$.plan_name", plan_name);
+        Update update = new Update().set("myplans.$.places_id", places_id).set("myplans.$.plan_name", plan_name).set("myplans.$.postscript",postscript);
 
         UpdateResult updateResult = mongoTemplate.updateFirst(query, update, UserDetailed.class);
 
@@ -279,6 +281,9 @@ public class UserDetailedDaoImpl implements UserDetailedDao {
         return mongoTemplate.findOne(query, UserDetailed.class);
 
     }
+
+
+
 
 
     /**
@@ -445,10 +450,9 @@ public class UserDetailedDaoImpl implements UserDetailedDao {
     }
 
 
-
     /**
      * @Title findMyCollectionsPlaceId
-     * @Description:  根据phone查找用户收藏的所有景点，组成List<Integer>
+     * @Description: 根据phone查找用户收藏的所有景点，组成List<Integer>
      * @param phone 手机号
      * @return java.util.List<java.lang.String>
      * @Author: chenyx
