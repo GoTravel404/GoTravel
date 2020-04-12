@@ -357,13 +357,13 @@ public class UserDetailedServicelmpl implements UserDetailedService {
 
                             map.put("place_id", place.getPlace_id());
                             map.put("name", place.getName());
-                            map.put("praise", place.getPraise());
 
-                            String picture = "";
-                            if (null != place.getPicture() && 0 != place.getPicture().size()) {
-                                picture = place.getPicture().get(0);
+                            String longitude_latitude = "";
+
+                            if (null != place.getLongitude_latitude() && !place.getLongitude_latitude().equals("")) {
+                                longitude_latitude = place.getLongitude_latitude();
                             }
-                            map.put("picture", picture);
+                            map.put("longitude_latitude", longitude_latitude);
 
                             resultList.add(map);
 
@@ -438,7 +438,7 @@ public class UserDetailedServicelmpl implements UserDetailedService {
 
         }
 
-        if(resultList.isEmpty()){
+        if (resultList.isEmpty()) {
             return null;
         }
 
