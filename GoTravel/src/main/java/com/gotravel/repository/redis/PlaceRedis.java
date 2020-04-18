@@ -11,10 +11,11 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.gotravel.enums.DefinedParam.REDIS_KEY_AllPlaces;
 
 /**
  * @Name: PlaceRedis
@@ -26,8 +27,6 @@ import java.util.Map;
 @Component
 public class PlaceRedis {
 
-    //Redis缓存的所有景点List的key值
-    private final static String REDIS_KEY = "AllPlaces";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -48,7 +47,7 @@ public class PlaceRedis {
     public List<Place> getRedisAllPlacesList() {
 
         //查询缓存
-        List<Object> placesList = redisTemplate.opsForHash().values(REDIS_KEY);
+        List<Object> placesList = redisTemplate.opsForHash().values(REDIS_KEY_AllPlaces);
         JSONArray array = (JSONArray) JSONArray.toJSON(placesList);
         List<Place> placesList_1 = JSONObject.parseArray(array.toJSONString(), Place.class);
 
@@ -57,7 +56,7 @@ public class PlaceRedis {
             synchronized (this) {  //加锁
 
                 //从redis获取
-                placesList = redisTemplate.opsForHash().values(REDIS_KEY);
+                placesList = redisTemplate.opsForHash().values(REDIS_KEY_AllPlaces);
                 array = (JSONArray) JSONArray.toJSON(placesList);
                 placesList_1 = JSONObject.parseArray(array.toJSONString(), Place.class);
 
@@ -73,7 +72,7 @@ public class PlaceRedis {
 
                         placeMap.put(String.valueOf(place.getPlace_id()), place);
                     }
-                    redisTemplate.opsForHash().putAll(REDIS_KEY, placeMap);
+                    redisTemplate.opsForHash().putAll(REDIS_KEY_AllPlaces, placeMap);
 
                     return placesList_2;
 
@@ -97,12 +96,12 @@ public class PlaceRedis {
     public Place getARedisPlaceByKey(String place_id) {
 
         //查询缓存是否存在key
-        if (!redisTemplate.hasKey(REDIS_KEY)) {
+        if (!redisTemplate.hasKey(REDIS_KEY_AllPlaces)) {
             log.info("【获取指定key的景点】：缓存为空,添加缓存");
             getRedisAllPlacesList();
         }
 
-        Object obj = redisTemplate.opsForHash().get(REDIS_KEY, place_id);
+        Object obj = redisTemplate.opsForHash().get(REDIS_KEY_AllPlaces, place_id);
 
         JSONObject json = (JSONObject) JSONObject.toJSON(obj);
 
@@ -121,7 +120,7 @@ public class PlaceRedis {
     public List<Place> getPlaceListByPipeline(List<String> keyList) {
 
         //查询缓存是否存在key
-        if (!redisTemplate.hasKey(REDIS_KEY)) {
+        if (!redisTemplate.hasKey(REDIS_KEY_AllPlaces)) {
             log.info("【根据通道一次性返回多个景点】：缓存为空,添加缓存");
             getRedisAllPlacesList();
         }
@@ -132,7 +131,7 @@ public class PlaceRedis {
             public Place doInRedis(RedisConnection redisConnection) throws DataAccessException {
                 redisConnection.openPipeline();
                 for (String key : keyList) {
-                    redisConnection.hGet(REDIS_KEY.getBytes(), key.getBytes());
+                    redisConnection.hGet(REDIS_KEY_AllPlaces.getBytes(), key.getBytes());
                 }
                 return null;
             }

@@ -3,8 +3,10 @@ package com.gotravel.controller;
 import com.gotravel.entity.Place;
 import com.gotravel.enums.PlaceEnum;
 import com.gotravel.enums.ResultEnum;
+import com.gotravel.service.PlaceCommentService;
 import com.gotravel.service.PlaceService;
 import com.gotravel.utils.ResultVOUtil;
+import com.gotravel.vo.PagePlaceCommentVO;
 import com.gotravel.vo.ResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.gotravel.enums.DefinedParam.PLACE_COMMENT_QUANTITY;
+
 /**
- * @Description:  place集合的所有操作接口
+ * @Description: place集合的所有操作接口
  *  @date 2019年8月4日 下午10:41:02
  */
 @RequestMapping("/goTravel/place")
@@ -24,9 +28,13 @@ public class PlaceController {
     private PlaceService placeService;
 
 
+    @Autowired
+    private PlaceCommentService placeCommentService;
+
+
     /**
      * @Title findPlacesByUserLabel
-     * @Description:  根据用户的标签+地点设定的范围为用户提供景点且按好评度排序
+     * @Description: 根据用户的标签+地点设定的范围为用户提供景点且按好评度排序
      * @param phone
      * @param distance
      * @param lon
@@ -45,28 +53,34 @@ public class PlaceController {
     }
 
 
-
     /**
      * @Title findPlaceByPlaceId
-     * @Description:  根据景点的place_id返回景点信息
+     * @Description: 根据景点的place_id返回景点信息
+     * @param phone
      * @param place_id
      * @Return: com.gotravel.vo.ResultVO
      * @Author: chenyx
      * @Date: 2020/3/19 19:45
      **/
-    @RequestMapping(value = "/findPlaceByPlaceId", method = RequestMethod.GET)
-    public ResultVO findPlaceByPlaceId(@RequestParam String place_id) {
+    @RequestMapping(value = "/findPlaceByPlaceId", method = RequestMethod.POST)
+    public ResultVO findPlaceByPlaceId(@RequestParam String phone,@RequestParam String place_id) {
 
         Place place = placeService.findPlaceByPlaceId(place_id);
 
-        Map<String,Object> resultMap=new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
 
         if (PlaceEnum.BAN.getCode() == place.getStatus()) {
 
             return ResultVOUtil.error(ResultEnum.PLACE_BAN.getCode(), ResultEnum.PLACE_BAN.getMessage());
+
         } else {
 
-            resultMap.put("place",place);
+            resultMap.put("place", place);
+
+            //返回该景点的前置评论
+            PagePlaceCommentVO pagePlaceCommentVO = placeCommentService.selectPlaceCommentPageByPlaceId(phone, place_id, 0, PLACE_COMMENT_QUANTITY);
+
+            resultMap.put("comment", pagePlaceCommentVO);
 
             return ResultVOUtil.success(resultMap);
         }
@@ -74,10 +88,9 @@ public class PlaceController {
     }
 
 
-
     /**
      * @Title findPlacesByPlaceLabel
-     * @Description:  根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)+地点设定的范围返回景点信息且按好评度排序
+     * @Description: 根据景点的Label(封装成三组List类型 ， 有List < hobby > 、 List < customization > 、 List < place_type >)+地点设定的范围返回景点信息且按好评度排序
      * @param map    List<hobby>，List<customization>，List<place_type> ，distance 距离 ，lon 经度 ，lat 维度 ,phone 手机号
      * @Return: com.gotravel.vo.ResultVO
      * @Author: chenyx
@@ -93,10 +106,9 @@ public class PlaceController {
     }
 
 
-
     /**
      * @Title findPlacesByPraise
-     * @Description:  根据好评度(热门)+地点设定的范围返回景点信息且按好评度排序
+     * @Description: 根据好评度(热门)+地点设定的范围返回景点信息且按好评度排序
      * @param phone
      * @param distance
      * @param lon
@@ -111,31 +123,6 @@ public class PlaceController {
         Map<String, Object> resultMap = placeService.findPlacesByPraise(phone, distance, lon, lat);
 
         return ResultVOUtil.success(resultMap);
-    }
-
-
-
-    /**
-     * @Title increasePlacePraise
-     * @Description: 景点添加好评
-     * @param place_id
-     * @Return: com.gotravel.vo.ResultVO
-     * @Author: chenyx
-     * @Date: 2020/3/29 11:46
-     **/
-    @RequestMapping(value = "/increasePlacePraise",method = RequestMethod.GET)
-    public ResultVO increasePlacePraise(@RequestParam String place_id){
-
-        int modifiedCount = placeService.increasePlacePraise(place_id);
-
-        if (modifiedCount > 0) {
-
-            return ResultVOUtil.success();
-        } else {
-
-            return ResultVOUtil.error(ResultEnum.INCREASE_PLACE_PRAISE.getCode(), ResultEnum.INCREASE_PLACE_PRAISE.getMessage());
-        }
-
     }
 
 

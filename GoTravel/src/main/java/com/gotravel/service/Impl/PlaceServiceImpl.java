@@ -1,12 +1,14 @@
 package com.gotravel.service.Impl;
 
+import com.gotravel.entity.Place;
+import com.gotravel.entity.UserDetailed;
 import com.gotravel.repository.nosqldao.PlaceDao;
 import com.gotravel.repository.nosqldao.UserDetailedDao;
 import com.gotravel.repository.redis.PlaceRedis;
-import com.gotravel.entity.Place;
-import com.gotravel.entity.UserDetailed;
+import com.gotravel.service.PlaceCommentService;
 import com.gotravel.service.PlaceService;
 import com.gotravel.utils.PlacesDistanceUtils;
+import com.gotravel.vo.PagePlaceCommentVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.gotravel.enums.DefinedParam.PLACE_COMMENT_QUANTITY;
 
 /**
  * @Description: Place景点表的Service实现层
@@ -33,6 +37,9 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Autowired
     private PlaceRedis placeRedis;
+
+    @Autowired
+    private PlaceCommentService placeCommentService;
 
 
     /**
@@ -57,6 +64,18 @@ public class PlaceServiceImpl implements PlaceService {
 
         //匹配符合距离范围的景点
         List<Map<String, Object>> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
+
+
+        for (Map<String, Object> place : places) {
+
+            Place p= (Place) place.get("place");
+
+            //返回该景点的前置评论
+            PagePlaceCommentVO pagePlaceCommentVO = placeCommentService.selectPlaceCommentPageByPlaceId(phone, p.getPlace_id(), 0, PLACE_COMMENT_QUANTITY);
+
+            place.put("comment",pagePlaceCommentVO);
+
+        }
 
         //返回用户收藏的景点Id
         List<String> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
@@ -113,6 +132,19 @@ public class PlaceServiceImpl implements PlaceService {
         //匹配符合距离范围的景点
         List<Map<String, Object>> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
 
+
+        for (Map<String, Object> place : places) {
+
+            Place p= (Place) place.get("place");
+
+            //返回该景点的前置评论
+            PagePlaceCommentVO pagePlaceCommentVO = placeCommentService.selectPlaceCommentPageByPlaceId(phone, p.getPlace_id(), 0, PLACE_COMMENT_QUANTITY);
+
+            place.put("comment",pagePlaceCommentVO);
+
+        }
+
+
         List<String> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
 
         Map<String, Object> resultMap = new HashMap<>();
@@ -147,6 +179,18 @@ public class PlaceServiceImpl implements PlaceService {
         //匹配符合距离范围的景点
         List<Map<String, Object>> places = PlacesDistanceUtils.getFitDistancePlaces(placesList, distance, lon, lat);
 
+
+        for (Map<String, Object> place : places) {
+
+            Place p= (Place) place.get("place");
+
+            //返回该景点的前置评论
+            PagePlaceCommentVO pagePlaceCommentVO = placeCommentService.selectPlaceCommentPageByPlaceId(phone, p.getPlace_id(), 0, PLACE_COMMENT_QUANTITY);
+
+            place.put("comment",pagePlaceCommentVO);
+
+        }
+
         List<String> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
 
         Map<String, Object> resultMap = new HashMap<>();
@@ -157,20 +201,6 @@ public class PlaceServiceImpl implements PlaceService {
         return resultMap;
     }
 
-
-    /**
-     * @Title increasePlacePraise
-     * @Description: 景点添加好评
-     * @param place_id
-     * @Return: int
-     * @Author: chenyx
-     * @Date: 2020/3/29 11:47
-     **/
-    @Override
-    public int increasePlacePraise(String place_id) {
-
-        return placeDao.increasePlacePraise(place_id);
-    }
 
 }
 

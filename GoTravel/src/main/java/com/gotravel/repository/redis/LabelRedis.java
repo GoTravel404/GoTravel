@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import static com.gotravel.enums.DefinedParam.REDIS_KEY_AllPlacesLabel;
 
 /**
  * @Name: RedisLabel
@@ -17,9 +18,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class LabelRedis {
-
-    //Redis缓存的所有景点的Label的key值
-    private final static String REDIS_KEY = "AllPlacesLabel";
 
     @Autowired
     //注入springboot自动配置好的redisTemplate
@@ -40,7 +38,7 @@ public class LabelRedis {
     public Label findAllLabel() {
 
         //查询缓存
-        Object obj = redisTemplate.opsForValue().get(REDIS_KEY);
+        Object obj = redisTemplate.opsForValue().get(REDIS_KEY_AllPlacesLabel);
 
         JSONObject json = (JSONObject) JSONObject.toJSON(obj);
 
@@ -51,7 +49,7 @@ public class LabelRedis {
 
             synchronized (this) {  //加锁
                 //从redis获取一下
-                 obj = redisTemplate.opsForValue().get(REDIS_KEY);
+                 obj = redisTemplate.opsForValue().get(REDIS_KEY_AllPlacesLabel);
                  json = (JSONObject) JSONObject.toJSON(obj);
                  label= JSONObject.toJavaObject(json, Label.class);
 
@@ -62,7 +60,7 @@ public class LabelRedis {
                     label =  mongoTemplate.findAll(Label.class).get(0);
 
                     //把数据库查询出来的数据，放到redis中
-                    redisTemplate.opsForValue().set(REDIS_KEY, label);
+                    redisTemplate.opsForValue().set(REDIS_KEY_AllPlacesLabel, label);
 
                 }else{
                     log.info("【返回官方的标签，并使用redis存储】：查询缓存");

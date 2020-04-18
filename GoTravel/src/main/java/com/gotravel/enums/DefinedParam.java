@@ -1,49 +1,58 @@
 package com.gotravel.enums;
 
-import org.springframework.beans.factory.annotation.Value;
-
 /**
  * @Name: DefinedParam
- * @Description:TODO 定义application-param.properties的各种参数
+ * @Description:TODO
  * @Author:chenyx
  * @Date: 2020/3/7 18:08
  **/
 public class DefinedParam {
 
-    //景点默认好评
-    @Value("${PLACE.PRAISE}")
-    public static int PLACE_PRAISE = 1000;
+    /**
+     * Redis缓存的所有景点List的key值
+     */
+    public final static String REDIS_KEY_AllPlaces = "AllPlaces";
 
-    //分页的每页记录数
-    @Value("${PAGE.SIZE}")
-    public static int PAGE_SIZE = 10;
 
-    //分析用户收藏的最多的景点个数
-    @Value("${COLLECTION.PLACE.SIZE}")
-    public static int COLLECTION_PLACE_SIZE = 30;
+    /**
+     * Redis缓存的所有景点的Label的key值
+     */
+    public final static String REDIS_KEY_AllPlacesLabel = "AllPlacesLabel";
 
-    //分析用户踏足的最多的景点个数
-    @Value("${HISTORY.PLACE.SIZE}")
-    public static int HISTORY_PLACE_SIZE = 30;
 
-    //分析用户计划的最多的景点个数
-    @Value("${PLAN.PLACE.SIZE}")
-    public static int PLAN_PLACE_SIZE = 30;
+    /**
+     * Redis缓存的景点评论的点赞数的key值
+     */
+    public final static String REDIS_KEY_PlaceCommentPraise = "PlaceCommentPraise";
 
-    //分析最多好评数的景点个数
-    @Value("${PLACE.PRAISE.SIZ}")
-    public static int PLACE_PRAISE_SIZE = 30;
 
-    //统计分析最多的景点标签个数
-    @Value("${ANALYSE.LABEL.SIZE}")
-    public static int ANALYSE_LABEL_SIZE = 30;
+    /**
+     * Redis缓存的用户点赞的景点评论的key值
+     */
+    public final static String REDIS_KEY_UserPraisePlaceComment = "UserPraisePlaceComment";
 
-    //统计分析最多的用户个数
-    @Value("${ANALYSE.USER.SIZE}")
-    public static int ANALYSE_USER_SIZE = 1000;
 
-    //Label标签表的唯一ID
-    @Value("${LABEL.ID}")
-    public static int LABEL_ID = 100;
+    /**
+     * place_comment的id前缀
+     */
+    public final static String PLACE_COMMENT_PREFIX = "pc";
+
+
+    /**
+     * user_praise_place_comment的id前缀
+     */
+    public final static String USER_PRAISE_PLACE_COMMENT_PREFIX = "uppc";
+
+
+    /**
+     * 返回景点的前置景点评论数量
+     */
+    public final static int PLACE_COMMENT_QUANTITY = 3;
+
+    /**
+     * 返回分页每页景点的景点评论数量
+     */
+    public final static int PLACE_COMMENT_SIZE = 32;
+
 
 }

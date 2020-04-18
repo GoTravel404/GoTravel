@@ -51,12 +51,6 @@ public interface PlaceService {
     Map<String, Object> findPlacesByPraise(String phone, int distance, double lon, double lat);
 
 
-    /**
-     * 景点添加好评
-     * @param place_id
-     * @return
-     */
-    int increasePlacePraise(String place_id);
 
 
 }

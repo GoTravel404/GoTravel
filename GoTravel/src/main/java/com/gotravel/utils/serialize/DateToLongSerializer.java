@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * @Name: DateToLongSerializer
- * @Description:TODO
+ * @Description: 返回的时间变成时间戳
  * @Author:chenyx
  * @Date: 2020/3/20 21:13
  **/
