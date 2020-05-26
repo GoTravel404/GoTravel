@@ -4,6 +4,7 @@
 package com.gotravel.controller;
 
 import com.gotravel.entity.User;
+import com.gotravel.service.IconService;
 import com.gotravel.service.UserService;
 import com.gotravel.utils.ResultVOUtil;
 import com.gotravel.vo.ResultVO;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +30,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private IconService iconService;
 
 
     /**
@@ -47,10 +52,9 @@ public class UserController {
     }
 
 
-
     /**
      * @Title login
-     * @Description:  用户登录走·旅行
+     * @Description: 用户登录走·旅行
      * @Param [phone, password]
      * @return java.lang.String
      * @Author: 陈一心
@@ -61,7 +65,6 @@ public class UserController {
 
         return userService.login(phone, password);
     }
-
 
 
     /**
@@ -81,13 +84,35 @@ public class UserController {
 
         User user = userService.editUserInfo(userId, name, gender, birthday, image);
 
-        UserVO userVO=new UserVO();
+        UserVO userVO = new UserVO();
 
-        BeanUtils.copyProperties(user,userVO);
+        BeanUtils.copyProperties(user, userVO);
 
         Map<String, Object> resultMap = new HashMap<>();
 
         resultMap.put("user", userVO);
+
+        return ResultVOUtil.success(resultMap);
+
+    }
+
+
+    /**
+     * @Title findIcon
+     * @Description: 查询所有头像路径
+     * @param
+     * @Return: com.gotravel.vo.ResultVO
+     * @Author: chenyx
+     * @Date: 2020/5/12 11:56
+     **/
+    @RequestMapping("/findIcon")
+    public ResultVO findIcon() {
+
+        List<String> iconList = iconService.findAllIcon();
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        resultMap.put("icon", iconList);
 
         return ResultVOUtil.success(resultMap);
 

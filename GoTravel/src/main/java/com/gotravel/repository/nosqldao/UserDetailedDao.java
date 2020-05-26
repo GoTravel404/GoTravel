@@ -82,7 +82,7 @@ public interface UserDetailedDao {
      * @param postscript
      * @return
      */
-    int addMyPlan(String phone, String plan_name, List<String> places_id,String postscript);
+    int addMyPlan(String phone, String plan_name, List<String> places_id, String postscript);
 
 
     /**
@@ -94,7 +94,7 @@ public interface UserDetailedDao {
      * @param postscript
      * @return
      */
-    int editMyPlan(String phone, String plan_name, List<String> places_id, long time,String postscript);
+    int editMyPlan(String phone, String plan_name, List<String> places_id, long time, String postscript);
 
 
     /**
@@ -150,12 +150,11 @@ public interface UserDetailedDao {
     UserDetailed findMyHistories(String phone);
 
 
-
     /**
-     * 根据phone查找用户收藏的所有景点，组成List<String>
+     * 根据phone返回用户的收藏景点和用户的标签
      * @param phone
      * @return
      */
-    List<String> findMyCollectionsPlaceId(String phone);
+    UserDetailed findMyCollectionsAndLabel(String phone);
 
 }

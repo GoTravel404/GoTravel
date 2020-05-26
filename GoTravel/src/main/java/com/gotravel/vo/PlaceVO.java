@@ -1,19 +1,18 @@
-package com.gotravel.entity;
+package com.gotravel.vo;
 
 import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
- * 景点表(place)
- * **/
+ * @Name: PlaceVO
+ * @Description:
+ * @Author:chenyx
+ * @Date: 2020/5/26 20:59
+ **/
 @Data
-@Document(collection = "place")
-public class Place implements Serializable ,Comparable<Place> {
-
+public class PlaceVO {
 
     /**
      * 景点id 加索引
@@ -40,6 +39,16 @@ public class Place implements Serializable ,Comparable<Place> {
      * 景点好评率
      */
     private int praise;
+
+    /**
+     * 景点收藏数
+     */
+    private int collection;
+
+    /**
+     * 距离/公里
+     */
+    private double distance;
 
     /**
      * 景点地址
@@ -71,17 +80,7 @@ public class Place implements Serializable ,Comparable<Place> {
      */
     private int status;
 
-    /**
-     * 景点收藏数
-     */
-    private int collection;
 
 
-    @Override
-    public int compareTo(Place o) {
-        //首次执行，o.praise代表List里第一个元素，this.praise是List里第二个元素
-        return Integer.compare(o.praise, this.praise);
-
-    }
 
 }

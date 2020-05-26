@@ -14,7 +14,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
@@ -57,7 +56,7 @@ public class ScheduledServiceImpl implements ScheduledService {
      * @Date: 2020/4/16 21:33
      **/
     @Async //基于@Async标注的方法，称之为异步方法；这些方法在执行的时候，将会在独立的线程中被执行，调用者无需等待它的完成，即可继续其他的操作。
-    @Scheduled(cron = "0 0/2 4-23,0-1 * * ?") //一天的5点到次日的2点每1分钟执行一次
+    //@Scheduled(cron = "0 0/2 4-23,0-1 * * ?") //一天的5点到次日的2点每1分钟执行一次
     //@Scheduled(cron = "*/15 * 4-23,0-1 * * ?") //一天的5点到次日的2点每15秒执行一次
     @Override
     public void persistMySqlPlaceCommentFormRedis() {

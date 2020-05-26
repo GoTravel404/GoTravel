@@ -5,9 +5,12 @@ import com.gotravel.enums.PlaceEnum;
 import com.gotravel.enums.ResultEnum;
 import com.gotravel.service.PlaceCommentService;
 import com.gotravel.service.PlaceService;
+import com.gotravel.utils.PlacesDistanceUtils;
 import com.gotravel.utils.ResultVOUtil;
 import com.gotravel.vo.PagePlaceCommentVO;
+import com.gotravel.vo.PlaceVO;
 import com.gotravel.vo.ResultVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,12 +61,14 @@ public class PlaceController {
      * @Description: 根据景点的place_id返回景点信息
      * @param phone
      * @param place_id
+     * @param lon
+     * @param lat
      * @Return: com.gotravel.vo.ResultVO
      * @Author: chenyx
-     * @Date: 2020/3/19 19:45
+     * @Date: 2020/5/26 21:23
      **/
     @RequestMapping(value = "/findPlaceByPlaceId", method = RequestMethod.POST)
-    public ResultVO findPlaceByPlaceId(@RequestParam String phone,@RequestParam String place_id) {
+    public ResultVO findPlaceByPlaceId(@RequestParam String phone, @RequestParam String place_id, @RequestParam double lon, @RequestParam double lat) {
 
         Place place = placeService.findPlaceByPlaceId(place_id);
 
@@ -75,7 +80,15 @@ public class PlaceController {
 
         } else {
 
-            resultMap.put("place", place);
+            //获取当前定位到景点的距离
+            double distance = PlacesDistanceUtils.getDistance(place, lon, lat);
+
+            PlaceVO placeVO = new PlaceVO();
+            BeanUtils.copyProperties(place, placeVO);
+
+            placeVO.setDistance(distance);
+
+            resultMap.put("place", placeVO);
 
             //返回该景点的前置评论
             PagePlaceCommentVO pagePlaceCommentVO = placeCommentService.selectPlaceCommentPageByPlaceId(phone, place_id, 0, PLACE_COMMENT_QUANTITY);
@@ -123,6 +136,27 @@ public class PlaceController {
         Map<String, Object> resultMap = placeService.findPlacesByPraise(phone, distance, lon, lat);
 
         return ResultVOUtil.success(resultMap);
+    }
+
+
+    /**
+     * @Title findPlacesByUserHistories
+     * @Description: 根据用户的出行记录+地点设定的范围为用户推荐景点且按好评度排序
+     * @param phone
+     * @param distance
+     * @param lon
+     * @param lat
+     * @Return: ResultVO
+     * @Author: chenyx
+     * @Date: 2020/3/19 19:30
+     **/
+    @RequestMapping(value = "/findPlacesByUserHistories", method = RequestMethod.POST)
+    public ResultVO findPlacesByUserHistories(@RequestParam String phone, @RequestParam int distance, @RequestParam double lon, @RequestParam double lat) {
+
+        Map<String, Object> resultMap = placeService.findPlacesByUserHistories(phone, distance, lon, lat);
+
+        return ResultVOUtil.success(resultMap);
+
     }
 
 

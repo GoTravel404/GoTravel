@@ -146,4 +146,23 @@ public class PlaceRedis {
     }
 
 
+    /**
+     * @Title editAPlaceToRedisAllPlaces
+     * @Description: TODO 根据key更新景点
+     * @param place
+     * @Return: void
+     * @Author: chenyx
+     * @Date: 2020/2/12 16:08
+     **/
+    public void editAPlaceToRedisAllPlaces(Place place) {
+
+        //查询缓存是否存在key
+        if (!redisTemplate.hasKey(REDIS_KEY_AllPlaces)) {
+            log.info("【根据key更新景点】：缓存为空,添加缓存");
+            getRedisAllPlacesList();
+        }
+
+        redisTemplate.opsForHash().put(REDIS_KEY_AllPlaces, String.valueOf(place.getPlace_id()), place);
+    }
+
 }

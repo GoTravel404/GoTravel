@@ -40,4 +40,24 @@ public class LabelController {
 
     }
 
+
+
+    /**
+     * @Title getLabelOfRange
+     * @Description: 返回范围标签
+     * @param
+     * @Return: com.gotravel.vo.ResultVO
+     * @Author: chenyx
+     * @Date: 2020/5/26 13:55
+     **/
+    @RequestMapping(value = "/getLabelOfRange", method = RequestMethod.GET)
+    public ResultVO getLabelOfRange() {
+
+        Map<String, Object> map = labelService.getLabelOfRange();
+
+        return ResultVOUtil.success(map);
+
+    }
+
+
 }

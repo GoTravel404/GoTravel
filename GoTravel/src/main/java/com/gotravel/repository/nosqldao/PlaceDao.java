@@ -5,6 +5,7 @@ import com.gotravel.entity.Place;
 import com.gotravel.entity.UserDetailed;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -37,5 +38,29 @@ public interface PlaceDao {
      * @param place_id
      * @return
      */
-    int increasePlacePraise(String place_id);
+    Map<String,Object> increasePlacePraise(String place_id);
+
+
+    /**
+     * 修改景点收藏数
+     * @param place_id
+     * @param code
+     * @return
+     */
+    Map<String, Object> editPlaceCollection(String place_id, int code);
+
+
+    /**
+     *  根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)返回景点信息且按好评度排序,去除特定的景点
+     * @param hobbyList
+     * @param customizationList
+     * @param place_typeList
+     * @param placeIdList
+     * @return
+     */
+    List<Place> findPlacesByPlaceLabelExceptPlaceIdList(List<String> hobbyList, List<String> customizationList, List<String> place_typeList, List<String> placeIdList);
+
+
+
 }
+

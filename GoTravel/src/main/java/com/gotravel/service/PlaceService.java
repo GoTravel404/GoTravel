@@ -31,13 +31,12 @@ public interface PlaceService {
     Place findPlaceByPlaceId(String place_id);
 
 
-
     /**
      *  根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)+地点设定的范围返回景点信息且按好评度排序
      * @param map
      * @return
      */
-    Map<String,Object> findPlacesByPlaceLabel(Map<String, Object> map);
+    Map<String, Object> findPlacesByPlaceLabel(Map<String, Object> map);
 
 
     /**
@@ -51,6 +50,24 @@ public interface PlaceService {
     Map<String, Object> findPlacesByPraise(String phone, int distance, double lon, double lat);
 
 
+    /**
+     * 根据用户的出行记录+地点设定的范围为用户推荐景点且按好评度排序
+     * @param phone
+     * @param distance
+     * @param lon
+     * @param lat
+     * @return
+     */
+    Map<String, Object> findPlacesByUserHistories(String phone, int distance, double lon, double lat);
+
+
+    /**
+     * 修改景点收藏数
+     * @param place_id
+     * @param code
+     * @return
+     */
+    void editPlaceCollection(String place_id, int code);
 
 
 }

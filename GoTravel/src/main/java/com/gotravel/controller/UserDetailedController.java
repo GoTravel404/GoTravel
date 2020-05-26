@@ -1,7 +1,9 @@
 package com.gotravel.controller;
 
 
+import com.gotravel.enums.PlaceEnum;
 import com.gotravel.enums.ResultEnum;
+import com.gotravel.service.PlaceService;
 import com.gotravel.service.UserDetailedService;
 import com.gotravel.utils.ResultVOUtil;
 import com.gotravel.vo.ResultVO;
@@ -23,6 +25,9 @@ public class UserDetailedController {
     @Autowired
     private UserDetailedService userDetailedService;
 
+    @Autowired
+    private PlaceService placeService;
+
 
     /**
      * @Title chooseLabel
@@ -37,10 +42,9 @@ public class UserDetailedController {
 
         userDetailedService.chooseLabel(map);
 
-        return ResultVOUtil.success();
+        return ResultVOUtil.success(map);
 
     }
-
 
 
     /**
@@ -53,11 +57,14 @@ public class UserDetailedController {
      * @Date: 2020/3/20 18:39
      **/
     @RequestMapping(value = "/addMyCollection", method = RequestMethod.POST)
-    public ResultVO addMyCollection(@RequestParam String phone, @RequestParam String place_id) {
+    public synchronized ResultVO addMyCollection(@RequestParam String phone, @RequestParam String place_id) {
 
         int modifiedCount = userDetailedService.addMyCollection(phone, place_id);
 
         if (modifiedCount > 0) {
+
+            //place的collection+1
+            placeService.editPlaceCollection(place_id, PlaceEnum.COLLECTION_INCREASE.getCode());
 
             return ResultVOUtil.success();
         } else {
@@ -66,7 +73,6 @@ public class UserDetailedController {
         }
 
     }
-
 
 
     /**
@@ -85,13 +91,15 @@ public class UserDetailedController {
 
         if (modifiedCount > 0) {
 
+            //place的collection-1
+            placeService.editPlaceCollection(place_id, PlaceEnum.COLLECTION_DECREASE.getCode());
+
             return ResultVOUtil.success();
         } else {
 
             return ResultVOUtil.error(ResultEnum.DELETE_COLLECTION_ERROR.getCode(), ResultEnum.DELETE_COLLECTION_ERROR.getMessage());
         }
     }
-
 
 
     /**
@@ -114,7 +122,6 @@ public class UserDetailedController {
         return ResultVOUtil.success(resultMap);
 
     }
-
 
 
     /**
@@ -165,7 +172,6 @@ public class UserDetailedController {
     }
 
 
-
     /**
      * @Title deleteMyPlan
      * @Description: 用户删除个人出行计划
@@ -192,7 +198,6 @@ public class UserDetailedController {
     }
 
 
-
     /**
      * @Title findMyPlans
      * @Description: 用户查找所有出行计划(返回所有出行计划的名称列表)
@@ -213,7 +218,6 @@ public class UserDetailedController {
         return ResultVOUtil.success(resultMap);
 
     }
-
 
 
     /**
@@ -239,7 +243,6 @@ public class UserDetailedController {
     }
 
 
-
     /**
      * @Title searchMyPlanByPhoneAndPlanName
      * @Description: 用户根据手机号+出行计划的名称查询计划列表
@@ -250,9 +253,9 @@ public class UserDetailedController {
      * @Date: 2020/4/8 17:33
      **/
     @RequestMapping(value = "/searchMyPlanByPhoneAndPlanName", method = RequestMethod.POST)
-    public ResultVO searchMyPlanByPhoneAndPlanName(@RequestParam String phone, @RequestParam String plan_name){
+    public ResultVO searchMyPlanByPhoneAndPlanName(@RequestParam String phone, @RequestParam String plan_name) {
 
-        List<Map<String, Object>> resultList = userDetailedService.searchMyPlanByPhoneAndPlanName(phone,plan_name);
+        List<Map<String, Object>> resultList = userDetailedService.searchMyPlanByPhoneAndPlanName(phone, plan_name);
 
         Map<String, Object> resultMap = new HashMap<>();
 
@@ -260,7 +263,6 @@ public class UserDetailedController {
 
         return ResultVOUtil.success(resultMap);
     }
-
 
 
     /**
@@ -289,7 +291,6 @@ public class UserDetailedController {
     }
 
 
-
     /**
      * @Title deleteHistoryPlace
      * @Description: 用户删除历史出行的单个景点
@@ -314,7 +315,6 @@ public class UserDetailedController {
         }
 
     }
-
 
 
     /**
@@ -342,7 +342,6 @@ public class UserDetailedController {
     }
 
 
-
     /**
      * @Title findMyHistories
      * @Description: 用户查找所有历史出行(返回所有日期的历史出行列表)
@@ -354,7 +353,7 @@ public class UserDetailedController {
     @RequestMapping(value = "/findMyHistories", method = RequestMethod.GET)
     public ResultVO findMyHistories(@RequestParam String phone) {
 
-        List<Map<String, Object>> resultList =userDetailedService.findMyHistories(phone);
+        List<Map<String, Object>> resultList = userDetailedService.findMyHistories(phone);
 
         Map<String, Object> resultMap = new HashMap<>();
 
@@ -362,7 +361,6 @@ public class UserDetailedController {
 
         return ResultVOUtil.success(resultMap);
     }
-
 
 
     /**
@@ -377,7 +375,7 @@ public class UserDetailedController {
     @RequestMapping(value = "/findMyHistoriesDetailed", method = RequestMethod.POST)
     public ResultVO findMyHistoriesDetailed(@RequestParam String phone, @RequestParam String date) {
 
-        Map<String, Object> map =userDetailedService.findMyHistoriesDetailed(phone, date);
+        Map<String, Object> map = userDetailedService.findMyHistoriesDetailed(phone, date);
 
         Map<String, Object> resultMap = new HashMap<>();
 

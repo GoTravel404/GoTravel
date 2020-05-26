@@ -21,12 +21,11 @@ public interface PlaceCommentService {
     /**
      * 用户添加景点评论
      * @param phone
-     * @param name
      * @param comment
      * @param place_id
      * @return
      */
-    void addPlaceComment(String phone, String name,String comment, String place_id);
+    void addPlaceComment(String phone,String comment, String place_id);
 
 
     /**

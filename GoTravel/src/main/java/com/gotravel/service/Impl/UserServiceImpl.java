@@ -22,13 +22,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -77,7 +75,7 @@ public class UserServiceImpl implements UserService {
             user.setGender(UserEnum.SECRECY.getMessage());
             user.setName(UserEnum.DEFAULT_NAME.getMessage());
             user.setImage("");
-            user.setStatus(UserEnum.NOT_ACTIVE.getCode());
+            user.setStatus(UserEnum.ACTIVE.getCode());//将status状态变成激活状态
 
             userRepository.save(user);
 
@@ -96,7 +94,7 @@ public class UserServiceImpl implements UserService {
             resultMap.put("label_customization", label_customization);
 
             //将status状态变成激活状态
-            userRepository.updateUserStatus(user.getUserId(), UserEnum.ACTIVE.getCode());
+           // userRepository.updateUserStatus(user.getUserId(), UserEnum.ACTIVE.getCode());
 
             return ResultVOUtil.success(resultMap);
 
@@ -106,7 +104,6 @@ public class UserServiceImpl implements UserService {
         }
 
     }
-
 
 
     /**
@@ -128,13 +125,60 @@ public class UserServiceImpl implements UserService {
 
         if (null != user) {    //验证通过
 
-            //用户基本信息
-            UserVO userVO = new UserVO();
-            BeanUtils.copyProperties(user, userVO);
+            //当用户未被禁用
+            if (user.getStatus() != 2) {
 
-            resultMap.put("user", userVO);
+                //用户基本信息
+                UserVO userVO = new UserVO();
+                BeanUtils.copyProperties(user, userVO);
 
-            return ResultVOUtil.success(resultMap);
+                resultMap.put("user", userVO);
+
+                //用户的收藏景点和用户的标签
+                UserDetailed userDetailed = userDetailedDao.findMyCollectionsAndLabel(phone);
+
+                if (null == userDetailed || CollectionUtils.isEmpty(userDetailed.getMyCollections())) {
+
+                    resultMap.put("collectionsPlaceIds", null);
+
+                } else {
+
+                    List<String> collectionsPlaceIds = new ArrayList<>();
+
+                    for (com.gotravel.entity.node.PlaceIdTime PlaceIdTime : userDetailed.getMyCollections()) {
+                        collectionsPlaceIds.add(PlaceIdTime.getPlace_id());
+                    }
+                    resultMap.put("collectionsPlaceIds", collectionsPlaceIds);
+                }
+
+
+                if (null == userDetailed || CollectionUtils.isEmpty(userDetailed.getHobby())) {
+
+                    resultMap.put("hobby", null);
+
+                } else {
+
+                    resultMap.put("hobby", userDetailed.getHobby());
+                }
+
+
+                if (null == userDetailed || CollectionUtils.isEmpty(userDetailed.getCustomization())) {
+
+                    resultMap.put("customization", null);
+
+                } else {
+
+                    resultMap.put("customization", userDetailed.getCustomization());
+                }
+
+
+                return ResultVOUtil.success(resultMap);
+
+            } else {//当用户被禁用
+
+                return ResultVOUtil.error(ResultEnum.LOGIN_BAN.getCode(), ResultEnum.LOGIN_BAN.getMessage());
+
+            }
 
         } else {    //验证不通过
 
@@ -145,10 +189,9 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     /**
      * @Title editUserInfo
-     * @Description:  用户编辑基本信息
+     * @Description: 用户编辑基本信息
      * @param userId
      * @param name
      * @param gender
@@ -163,13 +206,13 @@ public class UserServiceImpl implements UserService {
 
         Date date = null;
 
-        User user=userRepository.getOne(userId);
+        User user = userRepository.getOne(userId);
 
         try {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd");//日期格式
             date = format.parse(birthday);
 
-             user.setBirthday(date);
+            user.setBirthday(date);
 
         } catch (Exception e) {
             log.info("【用户编辑基本信息】：日期转换失败 ,birthday={}", birthday);

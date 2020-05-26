@@ -16,7 +16,14 @@ public enum PlaceEnum {
     //景点启用状态
     BAN(0, "禁用"),
     ACTIVE(1, "启用"),
-    ALL(2, "综合");
+    ALL(2, "综合"),
+
+    COLLECTION_INCREASE(0,"收藏数加一"),
+    COLLECTION_DECREASE(1,"收藏数减一")
+
+
+    ;
+
 
 
     private Integer code;

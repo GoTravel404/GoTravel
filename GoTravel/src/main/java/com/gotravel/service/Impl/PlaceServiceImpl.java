@@ -2,21 +2,23 @@ package com.gotravel.service.Impl;
 
 import com.gotravel.entity.Place;
 import com.gotravel.entity.UserDetailed;
+import com.gotravel.enums.PlaceEnum;
 import com.gotravel.repository.nosqldao.PlaceDao;
 import com.gotravel.repository.nosqldao.UserDetailedDao;
 import com.gotravel.repository.redis.PlaceRedis;
 import com.gotravel.service.PlaceCommentService;
 import com.gotravel.service.PlaceService;
+import com.gotravel.utils.OtherUtils;
 import com.gotravel.utils.PlacesDistanceUtils;
 import com.gotravel.vo.PagePlaceCommentVO;
+import com.gotravel.vo.PlaceItemVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.gotravel.enums.DefinedParam.PLACE_COMMENT_QUANTITY;
 
@@ -63,29 +65,9 @@ public class PlaceServiceImpl implements PlaceService {
         List<Place> placeList = placeDao.findPlacedByUserLabel(user_detailed);
 
         //匹配符合距离范围的景点
-        List<Map<String, Object>> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
+        List<Place> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
 
-
-        for (Map<String, Object> place : places) {
-
-            Place p= (Place) place.get("place");
-
-            //返回该景点的前置评论
-            PagePlaceCommentVO pagePlaceCommentVO = placeCommentService.selectPlaceCommentPageByPlaceId(phone, p.getPlace_id(), 0, PLACE_COMMENT_QUANTITY);
-
-            place.put("comment",pagePlaceCommentVO);
-
-        }
-
-        //返回用户收藏的景点Id
-        List<String> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
-
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("places", places);
-        map.put("collectionsPlaceIds", collectionsPlaceIds);
-
-        return map;
+        return getResult(places, phone);
     }
 
 
@@ -130,29 +112,10 @@ public class PlaceServiceImpl implements PlaceService {
         List<Place> placeList = placeDao.findPlacesByPlaceLabel(hobby, customization, place_type);
 
         //匹配符合距离范围的景点
-        List<Map<String, Object>> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
+        List<Place> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
 
 
-        for (Map<String, Object> place : places) {
-
-            Place p= (Place) place.get("place");
-
-            //返回该景点的前置评论
-            PagePlaceCommentVO pagePlaceCommentVO = placeCommentService.selectPlaceCommentPageByPlaceId(phone, p.getPlace_id(), 0, PLACE_COMMENT_QUANTITY);
-
-            place.put("comment",pagePlaceCommentVO);
-
-        }
-
-
-        List<String> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
-
-        Map<String, Object> resultMap = new HashMap<>();
-
-        resultMap.put("places", places);
-        resultMap.put("collectionsPlaceIds", collectionsPlaceIds);
-
-        return resultMap;
+        return getResult(places, phone);
     }
 
 
@@ -171,34 +134,153 @@ public class PlaceServiceImpl implements PlaceService {
     public Map<String, Object> findPlacesByPraise(String phone, int distance, double lon, double lat) {
 
         //查询所有景点信息
-        List placesList = placeRedis.getRedisAllPlacesList();
+        List placeList = placeRedis.getRedisAllPlacesList();
 
         //通过Collections类的sort()方法降序排序
-        Collections.sort(placesList);
+        Collections.sort(placeList);
 
         //匹配符合距离范围的景点
-        List<Map<String, Object>> places = PlacesDistanceUtils.getFitDistancePlaces(placesList, distance, lon, lat);
+        List<Place> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
+
+        return getResult(places, phone);
+    }
 
 
-        for (Map<String, Object> place : places) {
+    /**
+     * @Title findPlacesByUserHistories
+     * @Description: 根据用户的出行记录+地点设定的范围为用户推荐景点且按好评度排序
+     * @param phone
+     * @param distance
+     * @param lon
+     * @param lat
+     * @Return: java.util.Map<java.lang.String, java.lang.Object>
+     * @Author: chenyx
+     * @Date: 2020/5/6 17:10
+     **/
+    @Override
+    public Map<String, Object> findPlacesByUserHistories(String phone, int distance, double lon, double lat) {
 
-            Place p= (Place) place.get("place");
+        UserDetailed userDetailed = userDetailedDao.findMyHistories(phone);
 
-            //返回该景点的前置评论
-            PagePlaceCommentVO pagePlaceCommentVO = placeCommentService.selectPlaceCommentPageByPlaceId(phone, p.getPlace_id(), 0, PLACE_COMMENT_QUANTITY);
+        if (null == userDetailed || null == userDetailed.getMyHistories() || 0 == userDetailed.getMyHistories().size()) {
+            return findPlacesByUserLabel(phone, distance, lon, lat);
+        }
 
-            place.put("comment",pagePlaceCommentVO);
+        //获取所有用户的踏足(历史出行记录)的景点
+        List<String> placeIdList = OtherUtils.getHistoryPlaceIdListByUserDetailed(userDetailed);
+
+
+        /*
+         *获取户的历史出行景点的标签
+         */
+        //当用户的出行景点不是空
+        if (!CollectionUtils.isEmpty(placeIdList)) {
+
+            List<Place> placeList = placeRedis.getPlaceListByPipeline(placeIdList);//返回redis景点
+
+            List<String> place_typeList = new ArrayList<>();//景点的类型
+            List<String> hobbyList = new ArrayList<>();//景点的爱好
+            List<String> customizationList = new ArrayList<>();//景点的定制
+
+            for (Place place : placeList) {
+
+                if (null != place) {
+
+                    if (!CollectionUtils.isEmpty(place.getPlace_type()))
+                        place_typeList.addAll(place.getPlace_type());
+
+                    if (!CollectionUtils.isEmpty(place.getHobby()))
+                        hobbyList.addAll(place.getHobby());
+
+                    if (!CollectionUtils.isEmpty(place.getCustomization()))
+                        customizationList.addAll(place.getCustomization());
+                }
+            }
+
+
+            //Set去重复的元素
+            place_typeList = new ArrayList<>(new HashSet(place_typeList));
+            hobbyList = new ArrayList<>(new HashSet(hobbyList));
+            customizationList = new ArrayList<>(new HashSet(customizationList));
+
+
+            //根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)返回景点信息且按好评度排序,去除特定的景点
+            placeList = placeDao.findPlacesByPlaceLabelExceptPlaceIdList(hobbyList, customizationList, place_typeList, placeIdList);
+
+            //匹配符合距离范围的景点
+            List<Place> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
+
+            return getResult(places, phone);
 
         }
 
-        List<String> collectionsPlaceIds = userDetailedDao.findMyCollectionsPlaceId(phone);
+        return findPlacesByUserLabel(phone, distance, lon, lat);
+
+    }
+
+
+    /**
+     * @Title editPlaceCollection
+     * @Description: 修改景点收藏数
+     * @param place_id
+     * @param code
+     * @Return: void
+     * @Author: chenyx
+     * @Date: 2020/5/26 20:42
+     **/
+    @Override
+    public void editPlaceCollection(String place_id, int code) {
+
+        Map<String, Object> result = placeDao.editPlaceCollection(place_id, code);
+
+        if ((Integer) result.get("count") > 0) {
+
+            Place place = (Place) result.get("place");
+
+            if (code == PlaceEnum.COLLECTION_INCREASE.getCode()) {
+
+                place.setCollection(place.getCollection() + 1);
+            } else {
+
+                place.setCollection(place.getCollection() - 1);
+            }
+
+            //更新redis
+            placeRedis.editAPlaceToRedisAllPlaces(place);
+
+        }
+
+    }
+
+
+    public Map<String, Object> getResult(List<Place> places, String phone) {
+
+        List<Map<String, Object>> placeMapList = new ArrayList<>();
+
+        for (Place place : places) {
+
+            Map<String, Object> map = new HashMap<>();
+
+            //返回该景点的前置评论
+            PagePlaceCommentVO pagePlaceCommentVO = placeCommentService.selectPlaceCommentPageByPlaceId(phone, place.getPlace_id(), 0, PLACE_COMMENT_QUANTITY);
+
+            PlaceItemVO placeItemVO = new PlaceItemVO();
+            BeanUtils.copyProperties(place, placeItemVO);
+
+            map.put("place", placeItemVO);
+            map.put("comment", pagePlaceCommentVO);
+
+            placeMapList.add(map);
+
+        }
+
 
         Map<String, Object> resultMap = new HashMap<>();
 
-        resultMap.put("places", places);
-        resultMap.put("collectionsPlaceIds", collectionsPlaceIds);
+        resultMap.put("places", placeMapList);
 
         return resultMap;
+
     }
 
 

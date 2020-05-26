@@ -34,6 +34,12 @@ public class PlaceCommentVO {
     private String name;
 
     /**
+     * 用户头像
+     */
+    @JsonProperty("senderIcon")
+    private String icon;
+
+    /**
      * 评论内容
      */
     private String placeComment;

@@ -1,6 +1,7 @@
 package com.gotravel.controller;
 
 import com.gotravel.enums.ResultEnum;
+import com.gotravel.repository.PlaceCommentRepository;
 import com.gotravel.service.PlaceCommentService;
 import com.gotravel.utils.ResultVOUtil;
 import com.gotravel.vo.PagePlaceCommentVO;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.gotravel.enums.DefinedParam.PLACE_COMMENT_SIZE;
+import static com.gotravel.enums.DefinedParam.USER_PLACE_COMMENT_QUANTITY;
 
 /**
  * @Name: PlaceCommentController
@@ -28,6 +30,8 @@ public class PlaceCommentController {
     @Autowired
     private PlaceCommentService placeCommentService;
 
+    @Autowired
+    private PlaceCommentRepository placeCommentRepository;
 
     /**
      * @Title increasePlacePraise
@@ -45,6 +49,7 @@ public class PlaceCommentController {
         if (modifiedCount > 0) {
 
             return ResultVOUtil.success();
+
         } else {
 
             return ResultVOUtil.error(ResultEnum.INCREASE_PLACE_PRAISE.getCode(), ResultEnum.INCREASE_PLACE_PRAISE.getMessage());
@@ -58,17 +63,24 @@ public class PlaceCommentController {
      * @Title addPlaceComment
      * @Description: 用户添加景点评论
      * @param phone
-     * @param name
-     * @param comment
      * @param place_id
      * @Return: com.gotravel.vo.ResultVO
      * @Author: chenyx
      * @Date: 2020/4/15 19:36
      **/
     @RequestMapping(value = "/addPlaceComment", method = RequestMethod.POST)
-    public ResultVO addPlaceComment(@RequestParam String phone, @RequestParam String name, @RequestParam String comment, @RequestParam String place_id) {
+    public ResultVO addPlaceComment(@RequestParam String phone, @RequestParam String comment, @RequestParam String place_id) {
 
-        placeCommentService.addPlaceComment(phone, name, comment, place_id);
+        long result= placeCommentRepository.checkTodayPlaceComment(phone,place_id);
+
+        //判断每天每个用户最多给每个景点评论次数
+        if(result>=USER_PLACE_COMMENT_QUANTITY){
+
+            return ResultVOUtil.error(ResultEnum.ADD_PLACE_COMMENT_ERROR.getCode(),ResultEnum.ADD_PLACE_COMMENT_ERROR.getMessage());
+
+        }
+
+        placeCommentService.addPlaceComment(phone, comment, place_id);
 
         return ResultVOUtil.success();
 

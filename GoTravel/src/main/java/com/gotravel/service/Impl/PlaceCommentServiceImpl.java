@@ -1,11 +1,15 @@
 package com.gotravel.service.Impl;
 
 import com.gotravel.dto.UserPraisePlaceCommentRedisDTO;
+import com.gotravel.entity.Place;
 import com.gotravel.entity.PlaceComment;
+import com.gotravel.entity.User;
 import com.gotravel.enums.PlaceCommentEnum;
 import com.gotravel.repository.PlaceCommentRepository;
+import com.gotravel.repository.UserRepository;
 import com.gotravel.repository.nosqldao.PlaceDao;
 import com.gotravel.repository.redis.PlaceCommentRedis;
+import com.gotravel.repository.redis.PlaceRedis;
 import com.gotravel.repository.redis.UserPraisePlaceCommentRedis;
 import com.gotravel.service.PlaceCommentService;
 import com.gotravel.utils.KeyUtils;
@@ -22,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.gotravel.enums.DefinedParam.PLACE_COMMENT_PREFIX;
@@ -40,6 +45,9 @@ public class PlaceCommentServiceImpl implements PlaceCommentService {
     private PlaceCommentRepository placeCommentRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private UserPraisePlaceCommentRedis userPraisePlaceCommentRedis;
 
     @Autowired
@@ -48,6 +56,8 @@ public class PlaceCommentServiceImpl implements PlaceCommentService {
     @Autowired
     private PlaceCommentRedis placeCommentRedis;
 
+    @Autowired
+    private PlaceRedis placeRedis;
 
     /**
      * @Title increasePlacePraise
@@ -58,9 +68,25 @@ public class PlaceCommentServiceImpl implements PlaceCommentService {
      * @Date: 2020/3/29 11:47
      **/
     @Override
-    public int increasePlacePraise(String place_id) {
+    public synchronized int increasePlacePraise(String place_id) {
 
-        return placeDao.increasePlacePraise(place_id);
+        Map<String,Object> result = placeDao.increasePlacePraise(place_id);
+
+        if ((Integer) result.get("count") > 0) {
+
+            Place place= (Place) result.get("place");
+
+            place.setPraise(place.getPraise()+1);
+
+            //更新redis
+            placeRedis.editAPlaceToRedisAllPlaces(place);
+
+            return 1;
+
+        } else {
+
+            return 0;
+        }
     }
 
 
@@ -68,7 +94,6 @@ public class PlaceCommentServiceImpl implements PlaceCommentService {
      * @Title addPlaceComment
      * @Description: 用户添加景点评论
      * @param phone
-     * @param name
      * @param comment
      * @param place_id
      * @Return: void
@@ -76,7 +101,7 @@ public class PlaceCommentServiceImpl implements PlaceCommentService {
      * @Date: 2020/4/15 18:35
      **/
     @Override
-    public void addPlaceComment(String phone, String name, String comment, String place_id) {
+    public void addPlaceComment(String phone, String comment, String place_id) {
 
         String placeCommentId = PLACE_COMMENT_PREFIX + KeyUtils.getUniqueKry();
 
@@ -84,7 +109,6 @@ public class PlaceCommentServiceImpl implements PlaceCommentService {
 
         placeComment.setPlaceCommentId(placeCommentId);
         placeComment.setPhone(phone);
-        placeComment.setName(name);
         placeComment.setPlaceComment(comment);
         placeComment.setPlaceId(place_id);
         placeComment.setPraise(0);
@@ -165,18 +189,36 @@ public class PlaceCommentServiceImpl implements PlaceCommentService {
         if (0 == total)
             return null;
 
+
         //返回评论是否被该用户点赞
         List<UserPraisePlaceCommentRedisDTO> userPraisePlaceCommentRedisDTOList = placeCommentList.stream().map(e -> new UserPraisePlaceCommentRedisDTO(phone, place_id, e.getPlaceCommentId())).collect(Collectors.toList());
 
         List<Boolean> isPraiseList = userPraisePlaceCommentRedis.determineHasKey(userPraisePlaceCommentRedisDTOList);
 
+        //获取评论的用户的信息
+        List<User> userList = userRepository.findByPhoneIn(placeCommentList.stream().map(PlaceComment::getPhone).collect(Collectors.toList()));
 
+        //判断评论是否被该用户点赞
         List<PlaceCommentVO> placeCommentVOList = new ArrayList<>();
 
         for (int i = 0; i < placeCommentList.size(); i++) {
 
             PlaceCommentVO placeCommentVO = new PlaceCommentVO();
             BeanUtils.copyProperties(placeCommentList.get(i), placeCommentVO);
+
+            //设置评论的用户昵称和头像
+            for (User user : userList) {
+
+                if (user.getPhone().equals(placeCommentVO.getPhone())) {
+
+                    placeCommentVO.setName(user.getName());//设置评论的用户昵称
+                    placeCommentVO.setIcon(user.getImage());//设置评论的用户头像
+
+                    break;
+                }
+
+            }
+
 
             if (isPraiseList.get(i)) {
 
@@ -220,7 +262,7 @@ public class PlaceCommentServiceImpl implements PlaceCommentService {
         placeCommentRepository.deletePlaceCommentByPlaceCommentId(placeCommentId);
 
         //删除redis中关于该景点评论的点赞数和点赞用户
-        placeCommentRedis.deletePlaceComment(place_id,placeCommentId);
+        placeCommentRedis.deletePlaceComment(place_id, placeCommentId);
 
     }
 

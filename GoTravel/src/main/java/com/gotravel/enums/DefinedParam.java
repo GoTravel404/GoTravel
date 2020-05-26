@@ -55,4 +55,9 @@ public class DefinedParam {
     public final static int PLACE_COMMENT_SIZE = 32;
 
 
+    /**
+     * 每天每个用户最多给每个景点评论次数
+     */
+    public final static int USER_PLACE_COMMENT_QUANTITY = 20;
+
 }

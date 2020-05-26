@@ -16,4 +16,10 @@ public interface LabelService {
      */
     Map<String, Object> getAllLabel();
 
+
+    /**
+     * 返回范围标签
+     * @return
+     */
+    Map<String, Object> getLabelOfRange();
 }

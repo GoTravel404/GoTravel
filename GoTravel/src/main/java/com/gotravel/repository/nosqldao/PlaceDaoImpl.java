@@ -16,7 +16,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:TODO mongodb的Place表的CURD实现层
@@ -78,6 +80,10 @@ public class PlaceDaoImpl implements PlaceDao {
 
         query.with(new Sort(Direction.DESC, "praise"));
 
+        query.fields().exclude("introduce");
+        query.fields().exclude("picture");
+        query.fields().exclude("status");
+
         List<Place> placeList = mongoTemplate.find(query, Place.class);
 
         return placeList;
@@ -99,7 +105,7 @@ public class PlaceDaoImpl implements PlaceDao {
     public List<Place> findPlacesByPlaceLabel(List<String> hobby, List<String> customization, List<String> place_type) {
 
         //查询条件
-        Criteria criteria= OtherUtils.getCriteriaOfOrOperatorForLabel(place_type,hobby,customization);
+        Criteria criteria = OtherUtils.getCriteriaOfOrOperatorForLabel(place_type, hobby, customization);
 
         Query query = new Query(criteria);
 
@@ -109,32 +115,132 @@ public class PlaceDaoImpl implements PlaceDao {
         //降序
         query.with(new Sort(Sort.Direction.DESC, "praise"));
 
+        query.fields().exclude("introduce");
+        query.fields().exclude("picture");
+        query.fields().exclude("status");
+
         return mongoTemplate.find(query, Place.class);
 
     }
-
 
 
     /**
      * @Title increasePlacePraise
      * @Description: 景点添加好评
      * @param place_id
-     * @Return: int
+     * @Return: java.util.Map<java.lang.String, java.lang.Object>
      * @Author: chenyx
-     * @Date: 2020/3/29 11:52
+     * @Date: 2020/5/26 20:25
      **/
     @Override
-    public int increasePlacePraise(String place_id) {
+    public Map<String, Object> increasePlacePraise(String place_id) {
+
+        Map<String, Object> resultMap = new HashMap<>();
 
         Query query = new Query(Criteria.where("place_id").is(place_id));
 
-        Place place=mongoTemplate.findOne(query,Place.class);
+        Place place = mongoTemplate.findOne(query, Place.class);
 
-        Update update = new Update().set("praise", place.getPraise()+1);
+        if (place == null) {
+
+            resultMap.put("count", 0);
+
+            return resultMap;
+
+        }
+
+        Update update = new Update().set("praise", place.getPraise() + 1);
 
         UpdateResult updateResult = mongoTemplate.updateFirst(query, update, Place.class);
 
-        return (int) updateResult.getModifiedCount();
+        resultMap.put("count", (int) updateResult.getModifiedCount());
+        resultMap.put("place", place);
+
+        return resultMap;
+
+
+    }
+
+
+    /**
+     * @Title editPlaceCollection
+     * @Description: 修改景点收藏数
+     * @param place_id
+     * @param code
+     * @Return: java.util.Map<java.lang.String, java.lang.Object>
+     * @Author: chenyx
+     * @Date: 2020/5/26 20:46
+     **/
+    @Override
+    public Map<String, Object> editPlaceCollection(String place_id, int code) {
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        Query query = new Query(Criteria.where("place_id").is(place_id));
+
+        Place place = mongoTemplate.findOne(query, Place.class);
+
+        Update update = new Update();
+
+        if (place == null) {
+
+            resultMap.put("count", 0);
+
+            return resultMap;
+
+        }
+
+        if (code == PlaceEnum.COLLECTION_INCREASE.getCode()) {
+
+            update.set("collection", place.getCollection() + 1);
+
+        } else {
+
+            update.set("collection", place.getCollection() - 1);
+        }
+
+        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, Place.class);
+
+        resultMap.put("count", (int) updateResult.getModifiedCount());
+        resultMap.put("place", place);
+
+        return resultMap;
+    }
+
+
+    /**
+     * @Title findPlacesByPlaceLabelExceptPlaceIdList
+     * @Description: 根据景点的Label(封装成三组List类型 ， 有List < hobby > 、 List < customization > 、 List < place_type >)返回景点信息且按好评度排序, 去除特定的景点
+     * @param hobbyList
+     * @param customizationList
+     * @param place_typeList
+     * @param placeIdList
+     * @Return: java.util.List<com.gotravel.entity.Place>
+     * @Author: chenyx
+     * @Date: 2020/5/6 17:36
+     **/
+    @Override
+    public List<Place> findPlacesByPlaceLabelExceptPlaceIdList(List<String> hobbyList, List<String> customizationList, List<String> place_typeList, List<String> placeIdList) {
+
+        //查询条件
+        Criteria criteria = OtherUtils.getCriteriaOfOrOperatorForLabel(place_typeList, hobbyList, customizationList);
+
+        Query query = new Query(criteria);
+
+        //不好含的景点
+        query.addCriteria(Criteria.where("place_id").nin(placeIdList));
+
+        //景点状态为启动
+        query.addCriteria(Criteria.where("status").is(PlaceEnum.ACTIVE.getCode()));
+
+        //降序
+        query.with(new Sort(Sort.Direction.DESC, "praise"));
+
+        query.fields().exclude("introduce");
+        query.fields().exclude("picture");
+        query.fields().exclude("status");
+
+        return mongoTemplate.find(query, Place.class);
 
     }
 

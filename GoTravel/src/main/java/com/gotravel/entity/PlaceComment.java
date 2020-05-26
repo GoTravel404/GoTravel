@@ -29,11 +29,6 @@ public class PlaceComment {
     private String phone;
 
     /**
-     * 用户昵称
-     */
-    private String name;
-
-    /**
      * 评论的景点id
      */
     private String placeId;

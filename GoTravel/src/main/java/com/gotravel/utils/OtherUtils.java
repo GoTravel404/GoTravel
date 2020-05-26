@@ -111,4 +111,35 @@ public class OtherUtils {
         return user_detailed;
     }
 
+
+
+    /**
+     * @Title getHistoryPlaceIdListByUserDetailed
+     * @Description:   解析用户详细信息结构，获取用户的踏足(历史出行记录)的景点List<id>
+     * @param userDetailed
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chenyx
+     * @Date: 2020/3/6 20:35
+     **/
+    public static List<String> getHistoryPlaceIdListByUserDetailed(UserDetailed userDetailed) {
+
+
+        List<String> historyPlaceIdList = new ArrayList<>();
+
+        //解析结构
+            for (MyHistory myHistoryList : userDetailed.getMyHistories()) {
+
+                for (PlaceIdTime placeIdTime : myHistoryList.getPlaces_time()) {
+
+                    historyPlaceIdList.add(placeIdTime.getPlace_id());
+                }
+            }
+
+
+        return historyPlaceIdList;
+
+    }
+
+
+
 }

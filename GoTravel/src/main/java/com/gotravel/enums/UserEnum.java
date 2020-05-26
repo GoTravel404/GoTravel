@@ -15,7 +15,7 @@ import lombok.Getter;
 public enum UserEnum {
 
     ALL_ACTIVE(-1, "全部状态"),
-    NOT_ACTIVE(0, "未激活"),
+    //NOT_ACTIVE(0, "未激活"),
     ACTIVE(1, "激活"),
     BAN(2, "禁用"),
 

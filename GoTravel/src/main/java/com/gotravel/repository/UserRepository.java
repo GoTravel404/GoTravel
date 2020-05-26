@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 /**
  * @Name: UserRepository
  * @Description:TODO 用户信息
@@ -34,6 +36,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("update User as u set u.status =?2 where u.userId=?1")
     int updateUserStatus(Integer userId, Integer status);
 
+
+    /**
+     * 根据手机号List批量返回用户信息
+     */
+    List<User> findByPhoneIn(List<String> phones);
 
 
 }

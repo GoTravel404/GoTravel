@@ -13,6 +13,7 @@ public enum ResultEnum {
 
     PHONE_EXIST(100,"手机号码已被注册"),
     LOGIN_ERROR(101,"账号或密码错误"),
+    LOGIN_BAN(102,"账号因违规已无法使用"),
 
 
     SUCCESS(200,"成功"),
@@ -33,6 +34,8 @@ public enum ResultEnum {
     DELETE_HISTORY__ERROR(407,"删除历史出行记录失败"),
 
     INCREASE_PLACE_PRAISE(600,"景点添加好评失败"),
+
+    ADD_PLACE_COMMENT_ERROR(700,"今天已超过该景点评论次数"),
 
     EXCEPTION(500,"系统出错啦");
 

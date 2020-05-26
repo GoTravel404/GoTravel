@@ -154,6 +154,9 @@ public class UserDetailedServicelmpl implements UserDetailedService {
 
         }
 
+        //倒序
+        Collections.reverse(resultList);
+
         return resultList;
 
     }
@@ -265,8 +268,8 @@ public class UserDetailedServicelmpl implements UserDetailedService {
             return null;
         }
 
-        //按时间排序，时间最近的靠前
-        Collections.sort(myPlans);
+     //按时间排序，时间最近的靠前
+     // Collections.sort(myPlans);
 
         //封装返回出行计划名称(plan_name) , 计划时间(time)的json数组类型数据
 
@@ -283,6 +286,7 @@ public class UserDetailedServicelmpl implements UserDetailedService {
             resultList.add(map);
         }
 
+        Collections.reverse(resultList);
 
         return resultList;
 
@@ -526,7 +530,7 @@ public class UserDetailedServicelmpl implements UserDetailedService {
         }
 
 
-        List<Map<String, Object>> resultMap = new ArrayList<>();
+        List<Map<String, Object>> resultList = new ArrayList<>();
 
         //封装返回出行日期(date) , 浏览景点数量(place_number)的json数组类型数据
         for (MyHistory myhistory : userDetailed.getMyHistories()) {
@@ -536,11 +540,14 @@ public class UserDetailedServicelmpl implements UserDetailedService {
             map.put("date", myhistory.getDate());
             map.put("place_number", myhistory.getPlaces_time().size());
 
-            resultMap.add(map);
+            resultList.add(map);
 
         }
 
-        return resultMap;
+        //倒序
+        Collections.reverse(resultList);
+
+        return resultList;
 
     }
 
