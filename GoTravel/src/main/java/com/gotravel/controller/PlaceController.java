@@ -131,17 +131,17 @@ public class PlaceController {
      * @Date: 2020/3/19 22:26
      **/
     @RequestMapping(value = "/findPlacesByPraise", method = RequestMethod.POST)
-    public ResultVO findPlacesByPraise(@RequestParam String phone, @RequestParam int distance, @RequestParam double lon, @RequestParam double lat) {
+    public ResultVO findPlacesByPraise(@RequestParam String phone, @RequestParam int distance, @RequestParam double lon, @RequestParam double lat,@RequestParam String placeName) {
 
-        Map<String, Object> resultMap = placeService.findPlacesByPraise(phone, distance, lon, lat);
+        Map<String, Object> resultMap = placeService.findPlacesByPraise(phone, distance, lon, lat,placeName);
 
         return ResultVOUtil.success(resultMap);
     }
 
 
     /**
-     * @Title findPlacesByUserHistories
-     * @Description: 根据用户的出行记录+地点设定的范围为用户推荐景点且按好评度排序
+     * @Title findPlacesByUserBehavior
+     * @Description: 根据用户的出行记录+收藏景点+地点设定的范围为用户推荐景点且按好评度排序
      * @param phone
      * @param distance
      * @param lon
@@ -150,10 +150,10 @@ public class PlaceController {
      * @Author: chenyx
      * @Date: 2020/3/19 19:30
      **/
-    @RequestMapping(value = "/findPlacesByUserHistories", method = RequestMethod.POST)
-    public ResultVO findPlacesByUserHistories(@RequestParam String phone, @RequestParam int distance, @RequestParam double lon, @RequestParam double lat) {
+    @RequestMapping(value = "/findPlacesByUserBehavior", method = RequestMethod.POST)
+    public ResultVO findPlacesByUserBehavior(@RequestParam String phone, @RequestParam int distance, @RequestParam double lon, @RequestParam double lat) {
 
-        Map<String, Object> resultMap = placeService.findPlacesByUserHistories(phone, distance, lon, lat);
+        Map<String, Object> resultMap = placeService.findPlacesByUserBehavior(phone, distance, lon, lat);
 
         return ResultVOUtil.success(resultMap);
 

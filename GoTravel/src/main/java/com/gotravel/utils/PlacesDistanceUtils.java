@@ -171,9 +171,20 @@ public class PlacesDistanceUtils {
 
             String origins = lon + "," + lat;
 
-            String destination = convertLALPosition(longitude_latitude);
+            try {
+                String destination = convertLALPosition(longitude_latitude);
 
-            return getDistanceFromLaL(origins, destination);
+                return getDistanceFromLaL(origins, destination);
+
+            } catch (Exception e) {
+
+                // e.printStackTrace();
+
+                log.info("【计算景点到某经纬度的距离】：经纬度转换失败 Longitude_latitude={}", longitude_latitude);
+
+                return distance;
+            }
+
 
         }
 
@@ -231,6 +242,70 @@ public class PlacesDistanceUtils {
         return resultPlaceList;
     }
 
+
+    /**
+     * @Title getFitDistancePlaces
+     * @Description: 匹配符合距离范围的景点
+     * @param placesList
+     * @param distance
+     * @param lon
+     * @param lat
+     * @param placeName
+     * @Return: java.util.List<com.gotravel.entity.Place>
+     * @Author: chenyx
+     * @Date: 2020/5/28 18:50
+     **/
+    public static List<Place> getFitDistancePlaces(List<Place> placesList, int distance, double lon, double lat, String placeName) {
+
+        List<Place> resultPlaceList = new ArrayList<>(); //转载符合的范围的景点
+
+        boolean status = true;
+
+        for (Place place : placesList) {
+
+            //匹配到相同名称的景点
+            if (status && place.getName().equals(placeName)) {
+
+                resultPlaceList.add(0, place);
+
+                status = false;
+
+                continue;
+            }
+
+            String longitude_latitude = place.getLongitude_latitude();
+
+            //经纬度不为空
+            if (!Strings.isEmpty(longitude_latitude) && !longitude_latitude.equals("null")) {
+
+                try {
+
+                    String[] lal = longitude_latitude.trim().split(",");//分解经纬度字符串
+                    double longitude = Double.parseDouble(lal[1]);  //经度
+                    double latitude = Double.parseDouble(lal[0]); //维度
+
+                    //调用两经纬度之间的距离方法
+                    double sure_distance = getDistance_2(lon, lat, longitude, latitude);
+                    //int int_distance = Integer.parseInt(new java.text.DecimalFormat("0").format(sure_distance));//double转为int
+
+                    if (sure_distance <= distance) { //地点在指定的范围
+                        //log.info("sure_distance,{}",sure_distance);
+
+                        resultPlaceList.add(place);
+                    }
+
+                } catch (Exception e) {
+
+                    log.info("【匹配符合距离范围的景点】：经纬度转换失败 Longitude_latitude={}", longitude_latitude);
+                }
+
+            }
+
+        }
+
+        return resultPlaceList;
+
+    }
 
     /**
      * @Title sendGet

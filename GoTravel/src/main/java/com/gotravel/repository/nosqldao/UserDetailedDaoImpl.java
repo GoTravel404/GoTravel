@@ -431,19 +431,20 @@ public class UserDetailedDaoImpl implements UserDetailedDao {
 
 
     /**
-     * @Title findMyHistories
-     * @Description: 根据phone查询所有历史出行(返回所有日期的历史出行)
+     * @Title findMyHistoriesAndCollections
+     * @Description: 根据phone查询出行记录+收藏景点(返回所有日期的历史出行+收藏)
      * @param phone
      * @Return: com.gotravel.entity.UserDetailed
      * @Author: chenyx
      * @Date: 2020/3/21 22:01
      **/
     @Override
-    public UserDetailed findMyHistories(String phone) {
+    public UserDetailed findMyHistoriesAndCollections(String phone) {
 
         Query query = new Query(Criteria.where("phone").is(phone));
 
         query.fields().include("myhistories");
+        query.fields().include("mycollections");
 
         return mongoTemplate.findOne(query, UserDetailed.class);
 
@@ -469,5 +470,26 @@ public class UserDetailedDaoImpl implements UserDetailedDao {
         return mongoTemplate.findOne(query, UserDetailed.class);
 
     }
+
+
+    /**
+     * @Title findMyHistories
+     * @Description: 根据phone查询出行记录
+     * @param phone
+     * @Return: com.gotravel.entity.UserDetailed
+     * @Author: chenyx
+     * @Date: 2020/5/27 22:07
+     **/
+    @Override
+    public UserDetailed findMyHistories(String phone) {
+
+        Query query = new Query(Criteria.where("phone").is(phone));
+
+        query.fields().include("myhistories");
+
+        return mongoTemplate.findOne(query, UserDetailed.class);
+
+    }
+
 
 }

@@ -205,7 +205,6 @@ public class UserDetailedServicelmpl implements UserDetailedService {
     @Override
     public int editMyPlan(Map<String, Object> map) {
 
-
         String phone = (String) map.get("phone");
         String plan_name = (String) map.get("plan_name");
         List<String> places_id = (List<String>) map.get("places_id");
@@ -221,8 +220,9 @@ public class UserDetailedServicelmpl implements UserDetailedService {
 
 
         //数据库修改个人出行计划
-        return userDetailedDao.editMyPlan(phone, plan_name, places_id, time, postscript);
+        int a= userDetailedDao.editMyPlan(phone, plan_name, places_id, time, postscript);
 
+        return a;
     }
 
 

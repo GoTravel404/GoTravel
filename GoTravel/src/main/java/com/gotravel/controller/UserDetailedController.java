@@ -85,7 +85,7 @@ public class UserDetailedController {
      * @Date: 2020/3/20 18:40
      **/
     @RequestMapping(value = "/deleteMyCollection", method = RequestMethod.POST)
-    public ResultVO deleteMyCollection(@RequestParam String phone, @RequestParam String place_id) {
+    public synchronized ResultVO deleteMyCollection(@RequestParam String phone, @RequestParam String place_id) {
 
         int modifiedCount = userDetailedService.deleteMyCollection(phone, place_id);
 

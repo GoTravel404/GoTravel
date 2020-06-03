@@ -20,7 +20,7 @@ public class OtherUtils {
 
     /**
      * @Title getCriteriaOfOrOperatorForLabel
-     * @Description:  根据返回适合标签的OrOperator
+     * @Description: 根据返回适合标签的OrOperator
      * @param place_type
      * @param hobby
      * @param customization
@@ -28,7 +28,7 @@ public class OtherUtils {
      * @Author: chenyx
      * @Date: 2020/3/19 17:31
      **/
-    public static Criteria getCriteriaOfOrOperatorForLabel(List<String> place_type, List<String> hobby, List<String> customization){
+    public static Criteria getCriteriaOfOrOperatorForLabel(List<String> place_type, List<String> hobby, List<String> customization) {
 
         Criteria criteriaPlace_type = null, criteriaHobby = null, criteriaCustomization = null;
 
@@ -71,10 +71,9 @@ public class OtherUtils {
     }
 
 
-
     /**
      * @Title newUserDetailed
-     * @Description:  创建一个用户的详细信息
+     * @Description: 创建一个用户的详细信息
      * @param phone
      * @Return: com.gotravel.entity.UserDetailed
      * @Author: chenyx
@@ -112,10 +111,9 @@ public class OtherUtils {
     }
 
 
-
     /**
      * @Title getHistoryPlaceIdListByUserDetailed
-     * @Description:   解析用户详细信息结构，获取用户的踏足(历史出行记录)的景点List<id>
+     * @Description: 解析用户详细信息结构，获取用户的踏足(历史出行记录)的景点List<id>
      * @param userDetailed
      * @Return: java.util.List<java.lang.String>
      * @Author: chenyx
@@ -127,19 +125,44 @@ public class OtherUtils {
         List<String> historyPlaceIdList = new ArrayList<>();
 
         //解析结构
-            for (MyHistory myHistoryList : userDetailed.getMyHistories()) {
+        for (MyHistory myHistoryList : userDetailed.getMyHistories()) {
 
-                for (PlaceIdTime placeIdTime : myHistoryList.getPlaces_time()) {
+            for (PlaceIdTime placeIdTime : myHistoryList.getPlaces_time()) {
 
-                    historyPlaceIdList.add(placeIdTime.getPlace_id());
-                }
+                historyPlaceIdList.add(placeIdTime.getPlace_id());
             }
+        }
 
 
         return historyPlaceIdList;
 
     }
 
+
+    /**
+     * @Title getCollectionPlaceIdListByUserDetailed
+     * @Description: 解析用户详细信息结构，获取用户的收藏景点List<id>
+     * @param userDetailed
+     * @Return: java.util.List<java.lang.String>
+     * @Author: chenyx
+     * @Date: 2020/5/27 21:47
+     **/
+    public static List<String> getCollectionPlaceIdListByUserDetailed(UserDetailed userDetailed) {
+
+
+        List<String> collectionPlaceIdList = new ArrayList<>();
+
+        //解析结构
+        for (PlaceIdTime placeIdTime : userDetailed.getMyCollections()) {
+
+            collectionPlaceIdList.add(placeIdTime.getPlace_id());
+
+        }
+
+
+        return collectionPlaceIdList;
+
+    }
 
 
 }

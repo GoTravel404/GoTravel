@@ -45,20 +45,21 @@ public interface PlaceService {
      * @param distance
      * @param lon
      * @param lat
+     * @param placeName
      * @return
      */
-    Map<String, Object> findPlacesByPraise(String phone, int distance, double lon, double lat);
+    Map<String, Object> findPlacesByPraise(String phone, int distance, double lon, double lat,String placeName);
 
 
     /**
-     * 根据用户的出行记录+地点设定的范围为用户推荐景点且按好评度排序
+     * 根据用户的出行记录+收藏景点+地点设定的范围为用户推荐景点且按好评度排序
      * @param phone
      * @param distance
      * @param lon
      * @param lat
      * @return
      */
-    Map<String, Object> findPlacesByUserHistories(String phone, int distance, double lon, double lat);
+    Map<String, Object> findPlacesByUserBehavior(String phone, int distance, double lon, double lat);
 
 
     /**

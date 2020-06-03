@@ -20,7 +20,7 @@ public interface PlaceDao {
      * @param user_detailed
      * @return
      */
-    List<Place> findPlacedByUserLabel(UserDetailed user_detailed);
+    List<Place> findPlacesByUserLabel(UserDetailed user_detailed);
 
 
     /**

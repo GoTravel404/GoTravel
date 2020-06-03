@@ -12,6 +12,7 @@ import com.gotravel.utils.OtherUtils;
 import com.gotravel.utils.PlacesDistanceUtils;
 import com.gotravel.vo.PagePlaceCommentVO;
 import com.gotravel.vo.PlaceItemVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,11 @@ public class PlaceServiceImpl implements PlaceService {
         UserDetailed user_detailed = userDetailedDao.findByPhone(phone);
 
         //根据用户的标签为用户提供景点且按好评度排序
-        List<Place> placeList = placeDao.findPlacedByUserLabel(user_detailed);
+        List<Place> placeList = placeDao.findPlacesByUserLabel(user_detailed);
+
+        if (null == placeList || placeList.size() == 0) {
+            return findPlacesByPraise(phone, distance, lon, lat, null);
+        }
 
         //匹配符合距离范围的景点
         List<Place> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
@@ -126,12 +131,13 @@ public class PlaceServiceImpl implements PlaceService {
      * @param distance
      * @param lon
      * @param lat
+     * @param placeName
      * @Return: java.util.Map<java.lang.String, java.lang.Object>
      * @Author: chenyx
      * @Date: 2020/3/19 22:27
      **/
     @Override
-    public Map<String, Object> findPlacesByPraise(String phone, int distance, double lon, double lat) {
+    public Map<String, Object> findPlacesByPraise(String phone, int distance, double lon, double lat, String placeName) {
 
         //查询所有景点信息
         List placeList = placeRedis.getRedisAllPlacesList();
@@ -139,16 +145,31 @@ public class PlaceServiceImpl implements PlaceService {
         //通过Collections类的sort()方法降序排序
         Collections.sort(placeList);
 
-        //匹配符合距离范围的景点
-        List<Place> places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
+        List<Place> places = new ArrayList<>();
+
+        //去除字符串中的空格
+        String name=placeName.replaceAll("\\s*", "");
+
+        //存在与景点名称相同的景点
+        if (!StringUtils.isBlank(name)) {
+
+            //匹配符合距离范围的景点
+            places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat, name);
+
+        } else {
+
+            //匹配符合距离范围的景点
+            places = PlacesDistanceUtils.getFitDistancePlaces(placeList, distance, lon, lat);
+        }
+
 
         return getResult(places, phone);
     }
 
 
     /**
-     * @Title findPlacesByUserHistories
-     * @Description: 根据用户的出行记录+地点设定的范围为用户推荐景点且按好评度排序
+     * @Title findPlacesByUserBehavior
+     * @Description: 根据用户的出行记录+收藏景点+地点设定的范围为用户推荐景点且按好评度排序
      * @param phone
      * @param distance
      * @param lon
@@ -158,17 +179,43 @@ public class PlaceServiceImpl implements PlaceService {
      * @Date: 2020/5/6 17:10
      **/
     @Override
-    public Map<String, Object> findPlacesByUserHistories(String phone, int distance, double lon, double lat) {
+    public Map<String, Object> findPlacesByUserBehavior(String phone, int distance, double lon, double lat) {
 
-        UserDetailed userDetailed = userDetailedDao.findMyHistories(phone);
+        UserDetailed userDetailed = userDetailedDao.findMyHistoriesAndCollections(phone);
 
-        if (null == userDetailed || null == userDetailed.getMyHistories() || 0 == userDetailed.getMyHistories().size()) {
+        if (
+                null == userDetailed ||
+                        ((null == userDetailed.getMyHistories() || 0 == userDetailed.getMyHistories().size()) &&
+                                (null == userDetailed.getMyCollections() || 0 == userDetailed.getMyCollections().size()))
+        ) {
             return findPlacesByUserLabel(phone, distance, lon, lat);
+
         }
 
-        //获取所有用户的踏足(历史出行记录)的景点
-        List<String> placeIdList = OtherUtils.getHistoryPlaceIdListByUserDetailed(userDetailed);
 
+        List<String> placeIdList = new ArrayList<>(), historyPlaceIdList = new ArrayList<>(), collectionPlaceIdList = new ArrayList<>();
+
+        if (null != userDetailed.getMyHistories() && 0 != userDetailed.getMyHistories().size()) {
+            //获取所有用户的踏足(历史出行记录)的景点
+            historyPlaceIdList = OtherUtils.getHistoryPlaceIdListByUserDetailed(userDetailed);
+        }
+
+        if (null != userDetailed.getMyCollections() && 0 != userDetailed.getMyCollections().size()) {
+            //获取所有用户的收藏的景点
+            collectionPlaceIdList = OtherUtils.getCollectionPlaceIdListByUserDetailed(userDetailed);
+        }
+
+        if (!CollectionUtils.isEmpty(historyPlaceIdList)) {
+            placeIdList.addAll(historyPlaceIdList);
+        }
+
+        if (!CollectionUtils.isEmpty(collectionPlaceIdList)) {
+            placeIdList.addAll(collectionPlaceIdList);
+        }
+
+        Set<String> uniquePlaceIdList = new HashSet<>(placeIdList);
+
+        placeIdList = new ArrayList<>(uniquePlaceIdList);
 
         /*
          *获取户的历史出行景点的标签
@@ -199,9 +246,9 @@ public class PlaceServiceImpl implements PlaceService {
 
 
             //Set去重复的元素
-            place_typeList = new ArrayList<>(new HashSet(place_typeList));
-            hobbyList = new ArrayList<>(new HashSet(hobbyList));
-            customizationList = new ArrayList<>(new HashSet(customizationList));
+            place_typeList = new ArrayList<>(new HashSet<>(place_typeList));
+            hobbyList = new ArrayList<String>(new HashSet<>(hobbyList));
+            customizationList = new ArrayList<>(new HashSet<>(customizationList));
 
 
             //根据景点的Label(封装成三组List类型，有List<hobby>、List<customization>、List<place_type>)返回景点信息且按好评度排序,去除特定的景点

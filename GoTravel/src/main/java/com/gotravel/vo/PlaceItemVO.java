@@ -39,6 +39,11 @@ public class PlaceItemVO {
     private String address;
 
     /**
+     * 景点经纬度
+     */
+    private String longitude_latitude;
+
+    /**
      * 景点类型
      */
     private List<String> place_type;

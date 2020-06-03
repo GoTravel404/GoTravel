@@ -37,7 +37,7 @@ public class PlaceDaoImpl implements PlaceDao {
 
 
     /**
-     * @Title findByUserLabel
+     * @Title findPlacesByUserLabel
      * @Description: TODO 根据用户的标签为用户提供景点且按好评度排序
      * @param user_detailed 用户标签
      * @Return: java.util.List<Place>
@@ -45,7 +45,7 @@ public class PlaceDaoImpl implements PlaceDao {
      * @Date: 2020/3/19 17:13
      **/
     @Override
-    public List<Place> findPlacedByUserLabel(UserDetailed user_detailed) {
+    public List<Place> findPlacesByUserLabel(UserDetailed user_detailed) {
 
         List<String> hobby = user_detailed.getHobby();
         List<String> customization = user_detailed.getCustomization();
@@ -84,9 +84,8 @@ public class PlaceDaoImpl implements PlaceDao {
         query.fields().exclude("picture");
         query.fields().exclude("status");
 
-        List<Place> placeList = mongoTemplate.find(query, Place.class);
+        return mongoTemplate.find(query, Place.class);
 
-        return placeList;
     }
 
 

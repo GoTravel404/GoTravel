@@ -40,7 +40,7 @@ public interface UserDetailedDao {
 
     /**
      * @Title findByPhone
-     * @Description:TODO 根据phone提供该用户的个人详细信息
+     * @Description: 根据phone提供该用户的个人详细信息
      * @Param [phone]
      * @return User_detailed
      * @Author: 陈一心
@@ -143,11 +143,11 @@ public interface UserDetailedDao {
 
 
     /**
-     * 根据phone查询所有历史出行(返回所有日期的历史出行)
+     * 根据phone查询出行记录+收藏景点(返回所有日期的历史出行+收藏)
      * @param phone
      * @return
      */
-    UserDetailed findMyHistories(String phone);
+    UserDetailed findMyHistoriesAndCollections(String phone);
 
 
     /**
@@ -157,4 +157,11 @@ public interface UserDetailedDao {
      */
     UserDetailed findMyCollectionsAndLabel(String phone);
 
+
+    /**
+     * 根据phone查询出行记录
+     * @param phone
+     * @return
+     */
+    UserDetailed findMyHistories(String phone);
 }
