@@ -115,7 +115,8 @@ public class PlaceCommentRedis {
                 redisConnection.hSet(REDIS_KEY_PlaceCommentPraise.getBytes(), placeCommentId.getBytes(), JSON.toJSONBytes(placeCommentRedisDTO));
 
                 //缓存记录用户点赞的景点评论
-                redisConnection.hSet(REDIS_KEY_UserPraisePlaceComment.getBytes(), (phone + "::" + place_id + "::" + placeCommentId).getBytes(), JSON.toJSONBytes(userPraisePlaceCommentRedisDTO));
+               // redisConnection.hSet(REDIS_KEY_UserPraisePlaceComment.getBytes(), (phone + "::" + place_id + "::" + placeCommentId).getBytes(), JSON.toJSONBytes(userPraisePlaceCommentRedisDTO));
+                redisConnection.hSet(REDIS_KEY_UserPraisePlaceComment.getBytes(), (phone + "::" + place_id + "::" + placeCommentId).getBytes(), "".getBytes());
 
                 return null;
             }

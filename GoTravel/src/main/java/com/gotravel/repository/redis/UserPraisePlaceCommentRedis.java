@@ -10,8 +10,10 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
+import org.springframework.util.CollectionUtils;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static com.gotravel.enums.DefinedParam.REDIS_KEY_UserPraisePlaceComment;
 
@@ -41,18 +43,48 @@ public class UserPraisePlaceCommentRedis {
     public List<UserPraisePlaceCommentRedisDTO> getAllUserPraisePlaceCommentFormRedis() {
 
         //返回所有用户点赞的景点评论
-        List<Object> userPraisePlaceCommentRedisList = redisTemplate.opsForHash().values(REDIS_KEY_UserPraisePlaceComment);
+        // List<Object> userPraisePlaceCommentRedisList = redisTemplate.opsForHash().values(REDIS_KEY_UserPraisePlaceComment);
+        Set<Object> userPraisePlaceCommentRedisSet = redisTemplate.opsForHash().keys(REDIS_KEY_UserPraisePlaceComment);
+
+        List<Object> userPraisePlaceCommentRedisList = new ArrayList<>(userPraisePlaceCommentRedisSet);
 
         //当为空
-        if (userPraisePlaceCommentRedisList.isEmpty())
+        if (CollectionUtils.isEmpty(userPraisePlaceCommentRedisList))
             return null;
 
-        JSONArray array = (JSONArray) JSONArray.toJSON(userPraisePlaceCommentRedisList);
+        List<UserPraisePlaceCommentRedisDTO> result = new ArrayList<>();
 
-        return JSONObject.parseArray(array.toJSONString(), UserPraisePlaceCommentRedisDTO.class);
+        for (Object o : userPraisePlaceCommentRedisList) {
+
+            try {
+
+                String key = (String) o;
+
+                String[] value = key.split("::");
+
+                UserPraisePlaceCommentRedisDTO userPraisePlaceCommentRedisDTO = new UserPraisePlaceCommentRedisDTO();
+
+                userPraisePlaceCommentRedisDTO.setPhone(value[0]);
+                userPraisePlaceCommentRedisDTO.setPlaceId(value[1]);
+                userPraisePlaceCommentRedisDTO.setPlaceCommentId(value[2]);
+
+                result.add(userPraisePlaceCommentRedisDTO);
+
+            } catch (Exception e) {
+
+                log.info("【用户点赞的景点评论的key异常】,{}", o);
+
+            }
+
+        }
+
+//        JSONArray array = (JSONArray) JSONArray.toJSON(userPraisePlaceCommentRedisList);
+//
+//        return JSONObject.parseArray(array.toJSONString(), UserPraisePlaceCommentRedisDTO.class);
+
+        return result;
 
     }
-
 
 
     /**
